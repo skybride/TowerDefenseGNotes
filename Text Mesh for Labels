@@ -1,0 +1,88 @@
+Text Mesh for Labels
+
+Labels on Cubes showing coordinates (0, 0), (0,1) etc.
+Creating our own labels with using Text Mesh INSTEAD of UI Text
+
+[Step 1 : Adding Mesh on Top Quad]
+Select Top Quad of Cube. Create a child empty GameObject and name it Label.
+Add a Text Mesh Component on the Label gameobject
+
+[Step 2 : Resizing to Increase Resolution]
+Increasing font size will allow for more resolution. Then adjust the Character size to prefered size on cube. Finally adjust the color to stand out.
+
+Font Size: 100
+Character Size: 0.3
+Color: Blackish-Red
+
+NOTE: Text Mesh can be seen even if in the gameobject.
+
+[Step 3 : Finding Text Mesh from code -> using find component in children]
+(This is not a robust apporach, this anti-fragile)
+NOTE: Robust -> putting checks every where to make sure code will not break
+Anti-fragile -> solution for now. When code breaks in the future fix it then
+
+REMEMBER Memeber Variable and Instance is the same thing.
+
+Add TextMesh Type into CubeEditor Script and give TextMesh the variable name textMesh
+NOTE: TextMesh -> is a Type, textMesh -> variable name
+
+Should look like this:
+
+[ExecuteInEditMode]
+public class CubeEditor : MonoBehaviour {
+
+	[SerializeField] [Range(1f,20f)]float gridSize = 10f;
+
+	TextMesh textMesh;
+
+	void Update()
+	{
+		Vector3 snapPos;
+
+		snapPos.x = Mathf.RoundToInt(transform.position.x / gridSize) * gridSize;
+		snapPos.z = Mathf.RoundToInt (transform.position.z / gridSize) * gridSize;
+		transform.position = new Vector3 (snapPos.x, 0f, snapPos.z);
+
+		textMesh = GetComponentInChildren<TextMesh> ();
+		textMesh.text = snapPos.x + "," + snapPos.z;
+
+	}
+}
+
+NOTE: normally variable = GetComponent???,<elementTryingToManipulate>();
+would be put in start.
+
+But this means the developer would have to trigger the start (play button) in order to see text mesh change. We want this to be visible during the update so that adjustments can be seen in the scene view.
+
+Order of Operation also matters.
+
+textMesh = GetComponentInChildren<TextMesh> ();
+textMesh.text = snapPos.x + "," + snapPos.z;
+
+cannot be placed above this line:
+
+snapPos.x = Mathf.RoundToInt(transform.position.x / gridSize) * gridSize;
+snapPos.z = Mathf.RoundToInt (transform.position.z / gridSize) * gridSize;
+transform.position = new Vector3 (snapPos.x, 0f, snapPos.z);
+
+Why? -> the snapPos valuses that textMesh wants to find needs to be generated (found) after snapPos has generated the new transform.position.
+
+TEST This
+
+In the Scene View the Label should read 0,0 -> when moving cube around the label textmesh should change.
+
+[Step 4 : Attribute SelectionBase]
+
+To avoid breaking cube and pulling top quad or side quad etc. Add SelectionBase under ExecuteInEditMode in CubeEditor Script.
+
+Unity understands that the base (main) object you are trying to grab is the entire Cube GameObject.
+
+[Step 5 : Adjusting grid from displaying 10x 10 movements to 1s]
+
+Should look like this:
+
+textMesh.text = snapPos.x / gridSize + "," + snapPos.z / gridSize;
+
+TEST this in the Scene view!
+Duplicate cubes!
+See what Happens!

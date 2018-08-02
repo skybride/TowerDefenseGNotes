@@ -1,0 +1,69 @@
+Execute in Edit Mode
+
+*Creating the grid
+
+[using snap setting -> Edit -> snap setting -> set the x,y,z values]
+(NOTE: You have to be holding ctrl while snapping the gameobject into the desired grid values) We will not be using this as it might not be precised if developer is not always holding down ctrl.
+
+We will not be using the pre-made snap setting values in Unity.
+We will be making our own script to edit with.
+
+[Step 1 : How to Execute Edit]
+Select the Cube and create a new C#script on it (call it EditorSnap)
+
+
+---
+
+-> Find ExecuteinEditMode from Unity Documentation Scripting API
+[Step 2 : Adding Code from API]
+Copy and paste values from Unity Documentation into EditorSnap Script
+
+Test to see what happens
+
+
+---
+
+[Step 3 : Keep and Remove]
+Remove Awake as it is only triggered when play button is active.
+Adjust the void Update.
+
+It should now read as follows:
+
+void Update()
+	{
+		Vector3 snapPos;
+		snapPos.x = Mathf.RoundToInt(transform.position.x / 10f) * 10f;
+		snapPos.z = Mathf.RoundToInt (transform.position.z / 10f) * 10f;
+
+		transform.position = new Vector3 (snapPos.x, 0f, snapPos.z);
+	}
+
+Test in Unity Scene view. 
+Duplicate the cube and try moving the copy cube in the x and z position (it should snap in to place...not ctrl needs to be held down)
+
+NOTE: y is = 0f because in our tower defense game there will not be vertical movements. (Maybe something to add to challenging levels of game)
+
+
+---
+
+[Step 4 : Adding SerializeField and Removing Nauty numbers]
+Add Serializefield so that values can be adjusted in the Inspector, since it's better not to have magic numbers in code, they should be initialized as a variable to be used in code
+
+Should look like this:
+
+Vector3 snapPos;
+		snapPos.x = Mathf.RoundToInt(transform.position.x / gridSize) * gridSize;
+		snapPos.z = Mathf.RoundToInt (transform.position.z / gridSize) * gridSize;
+
+
+---
+
+[Step 5 : Range Constriction]
+Constricting the amount of range developer can adjust
+
+Should look like this: 
+[SerializeField] [Range(1f,20f)]float gridSize = 10f;
+
+This will constrict inspector movements by developer to range only between 1f and 20f
+
+
