@@ -1,2 +1,79 @@
 Custom Paths
 
+Create a new GameObject -> Rename it World
+
+To Avoid name confusion in Hierarchy and with cube make an adjustment in CubeEditor script
+
+[Step 1 : Adjust textMesh.text]
+
+Should look like this:
+
+textMesh = GetComponentInChildren<TextMesh> ();
+string labelText = snapPos.x /gridSize + "," + snapPos.z /gridSize;
+textMesh.text = 
+
+[Step 2 : textMesh output will be the string labelText]
+
+Should look like this:
+
+textMesh = GetComponentInChildren<TextMesh> ();
+string labelText = snapPos.x /gridSize + "," + snapPos.z /gridSize;
+textMesh.text = labelText;
+gameObject.name = labelText;
+
+NOTE: Inspector name for cubes will match coordinates of cube
+
+[Step 3 : Create an Enemy]
+
+Create an Empty GameObject and name it Enemy. Add a 3D Capsule as a child and rename it Body. Attach a script component onto Enemy -> Name it EnemyMovement.
+(Good time to also add material onto body of enemy)
+
+[Step 4 : Grouping Cubes]
+
+Create a new script component on cube gameobject and all it block. Apply it to prefab so that all cubes now have the block script component. (Quick way to group grid cubes together)
+
+---
+
+Lists vs Arrays
+
+Array:
+Collection Size: Fixed
+Performance: Fast
+Ease of Use: Easy
+Flexibility: Low
+How to use: Block[]
+
+List:
+Collection Size: Variable
+Performance: Varies
+Ease of Use: Easy
+Flexibility: Hight
+How to use: List<Block>
+
+[Step 5 : Setting up EnemyMovement script]
+
+Using a foreach loop to print out in the console the path in order. Ben gave a docs.microsoft.com/en/-us/dotnet/csharp/language-reference/keywords/foreach-in link
+
+doc:
+foreach (int element in varObject)
+{
+	print(element.name);
+}
+
+Should look like this:
+
+Add [SerializeField] List<Block> path
+
+void Start ()
+	{
+		PrintAllWaypoints();
+	}
+
+	private void PrintAllWaypoints()
+	{
+		foreach (Block waypoint in path) 
+		{
+			print (waypoint.name);
+		}
+	}
+
