@@ -1,0 +1,85 @@
+Coroutines
+
+*Change main camera view
+
+Click on Main Camera -> GameObject -> Align with View (ctrl shift F)
+
+Open Block Script and rename it Waypoint
+
+Adjust Enemy Script -> rename all 'Block' Elements with Waypoint
+
+Children GameObjects of World will now be broken. Click on the tiny circle below the setting cog where it says Nothing Selected and find Waypoint
+
+NOTE: Think of Co-Routine and Main-Routine like Co-Pilot and Main-Pilot
+
+yield = pause for a second
+
+[Step 1 : Adding in a Coroutine]
+
+Change 'private void PrintAllWaypoints()' -> 'IEnumerator PrintAllWaypoints()'. Add yield return new WaitForSeconds (1f);. Change 'PrintAllWaypoints()' in void Start -> 'StartCoroutine(PrintAllWaypoints());'
+
+Should look like this:
+
+public class EnemyMovement : MonoBehaviour {
+
+	[SerializeField] List<Waypoint> path;
+
+	void Start ()
+	{
+		StartCoroutine(PrintAllWaypoints());
+	}
+
+	IEnumerator PrintAllWaypoints()
+	{
+		foreach (Waypoint waypoint in path) 
+		{
+			print (waypoint.name);
+			yield return new WaitForSeconds (1f);
+		}
+	}
+}
+
+[Step 2 : Set Enemy Transform to Waypoint's Transform]
+
+'Remove print(waypoint.name);' -> Replace it with 'transform.position = waypoint.transform.position;'
+
+Should look like this:
+
+foreach (Waypoint waypoint in path) 
+		{
+			transform.position = waypoint.transform.position;
+			yield return new WaitForSeconds (1f);
+		}
+
+[Step 3 : Rename PrintAllWaypoints]
+
+Since we're now not trying to print the way points -> change the coroutine method to ' FollowPath'
+
+NOTE:
+
+Think of Coroutine like a yield instruction
+
+[Step 3 : Get Enemy to Patrol and Log it's Position]
+
+-Get the log printing the following...
+-"Starting patrol..."
+-"Visiting block: 1,0 (etc)"
+
+Should look like this:
+
+IEnumerator FollowPath()
+	{
+		print ("Starting patrol...");
+		foreach (Waypoint waypoint in path) 
+		{
+			transform.position = waypoint.transform.position;
+			print ("Visting block: " + waypoint);
+			yield return new WaitForSeconds (1f);	 
+		}
+		print("Ending patrol");
+	}
+
+Thought Process: 
+1.Starting patrol gets printed.
+2.Foreach loop gets printed and repeated until end of path is reached.
+3.When foreach loop ends Ending patrol will be printed.
