@@ -1,1 +1,67 @@
 Types of Pathfinding
+
+**CHECK THIS OUT!
+https://www.redblobgames.com/pathfinding/a-star/introduction.html
+
+**calculating the shortest path so that the game can run smoothly
+
+Search Algorithms Overview
+
+Search Algorithm:
+- Breadth First Search BFS
+- Dijkstra's algorithm
+- A Star
+
+NOTE: movement cost in this case is the ability to move through different speeds.
+
+BFS: 
+- Always Shortest Path 
+- Multiple End Points
+- Medium (speed on 100X100 grid)
+Notes: simple, versatile, fast enough most of the time (Point to Point pathfinding, but no speed changes allowed on path)
+
+Dijkstra's Algorithm:
+- Always Shortest Path
+- Movement cost can vary
+- Multiple end points
+- Slow (speed on 100x100)
+Notes: Movement cost allows for swamps, roads etc (Pathfinding can calculate if the swamp path is quicker or road path)
+
+A Star:
+- Choice (Developer can choose between speed vs accuracy)
+- Movement cost can vary
+- Fast (speed on 100x100)
+Notes: Complex, Can trade speed against accuracy
+
+** Explore out, leave bread crumbs and walk on path.
+
+Search Algorithm Speed Comparison
+
+(approximate worst-case number of calculations to find the shortest path)
+
+Algorithm:
+- BFS
+- Dijkstra's
+- A*
+
+Speed:
+BFS: V + E
+Dijkstra: E+V log V
+A* : varies
+
+10x10grid:
+BFS: 280
+Dijsktra: 380
+A*: 180
+
+20x20 grid:
+BFS: 1160
+Dijkstra: 1801
+A*: 760
+
+100x100 grid
+BFS: 29800 Medium
+Dijkstra: 59800 Slow
+A*: 19800 Fast
+
+*S star has the benefit that we can chose the trade-off between speed and accuracy to suit our game.
