@@ -1,0 +1,294 @@
+Instance Variables and Constances
+
+*Decoupling
+
+(CubeEditor Script will not be a dependant)
+
+Waypoint: 
+Class that holds information about each cube. 
+It also hold the state and understand if cube is parsable or not.
+
+Unity's Editor:
+(Note Code)
+
+Dependencies:
+CubeEditor is dependant on Unity's Editor and Waypoint,
+but not in reverse. Cube Editor should be able to be removed with out breaking anything.
+
+*Allowing different gridsizes needs to be altered (defeats the purpose of having a constant grid layout to follow)
+
+[Step 1 :]
+Make '[SerializeField] [Range(1f,20f)]float gridSize = 10f;' into a const
+
+Should look like this:
+
+const int gridSize = 10f;
+
+
+**Current problem:
+Waypoint has no way of knowing grid position (snapPos)
+
+[Step 2 :]
+Rename snapPost to gridPos. Make gridPos a member variable so that it can be accessed outside of CubeEditor script.
+
+[Step 3 :]
+Refactor gridSize snapping and text mesh labeling.
+
+Should look like this:
+
+[ExecuteInEditMode]
+[SelectionBase]
+public class CubeEditor : MonoBehaviour {
+
+	const int gridSize = 10f;
+
+	TextMesh textMesh;
+
+	Vector3 gridPos;
+
+	void Update()
+	{
+		
+		SnapToGrid ();
+
+		UpdateLabel ();
+
+	}
+
+	void SnapToGrid ()
+	{
+		gridPos.x = Mathf.RoundToInt (transform.position.x / gridSize) * gridSize;
+		gridPos.z = Mathf.RoundToInt (transform.position.z / gridSize) * gridSize;
+		transform.position = new Vector3 (gridPos.x, 0f, gridPos.z);
+	}
+
+	void UpdateLabel ()
+	{
+		textMesh = GetComponentInChildren<TextMesh> ();
+		string labelText = gridPos.x / gridSize + "," + gridPos.z / gridSize;
+		textMesh.text = labelText;
+		gameObject.name = labelText;
+	}
+}
+
+[Step 4:]
+
+Add RequireComponent.
+
+Should look like this:
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+[ExecuteInEditMode]
+[SelectionBase]
+[RequireComponent(typeof(Waypoint))]
+public class CubeEditor : MonoBehaviour {...}
+
+[Step 5 :]
+
+Add 'Waypoint waypoint;' variable. On Awake CubeEditor script to look for waypoint variable by getting component <Waypoint> script.
+
+Should look like this:
+
+const int gridSize = 10f;
+
+	TextMesh textMesh;
+	Vector3 gridPos;
+	Waypoint waypoint;
+
+	void Awake()
+	{
+		waypoint = GetComponent<Waypoint> ();
+	}
+
+[Step 6:]
+Getting gridSize and gridPosition off of CubeEditor and on to Waypoint script
+
+Should look like this for CubeEditor script:
+
+	void SnapToGrid ()
+	{
+		int gridSize = waypoint.GetGridSize ();
+		gridPos.x = Mathf.RoundToInt (transform.position.x / gridSize) * gridSize;
+		gridPos.z = Mathf.RoundToInt (transform.position.z / gridSize) * gridSize;
+		transform.position = new Vector3 (gridPos.x, 0f, gridPos.z);
+	}
+
+	void UpdateLabel ()
+	{
+		textMesh = GetComponentInChildren<TextMesh> ();
+		int gridSize = waypoint.GetGridSize ();
+		string labelText = gridPos.x / gridSize + "," + gridPos.z / gridSize;
+		textMesh.text = labelText;
+		gameObject.name = labelText;
+	}
+}
+
+---
+
+Should look like this for Waypoint script:
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Waypoint : MonoBehaviour {
+
+	const int gridSize = 10;
+
+	// Use this for initialization
+	void Start () {
+		
+	}
+
+	public int GetGridSize()
+	{
+		return gridSize;
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+}
+
+[Step 7 :]
+
+CubeEditor shouldn't be doing calculation of where object is. Waypoint should be doing the calculation. 
+
+'Add Vector2Int gridPos;'
+
+Should look like this: 
+
+public class Waypoint : MonoBehaviour {
+
+	Vector2Int gridPos;
+	const int gridSize = 10;
+
+	// Use this for initialization
+	void Start () {
+
+[Step 8 :]
+
+Create a 'public Vector2 GetGridPos(){}' with a 'return new Vector2int{}' and cut and paste gridSize from CubeEditor to Waypoint.
+NOTE: semi-colons on the end of Mathf.RoundToInt for x will have to be removed and replaced with a comma and 'gridPos = Mathf.' has been reduced to just Mathf...
+
+Should look like this:
+
+	public Vector2 GetGridPos()
+	{
+		return new Vector2Int(
+			Mathf.RoundToInt (transform.position.x / gridSize) * gridSize,
+			Mathf.RoundToInt (transform.position.z / gridSize) * gridSize
+		);
+	}
+
+[Step 9 :]
+
+Adjust 'SnapToGrid()' on CubeEditor script
+Should look like this:
+
+void SnapToGrid ()
+	{
+		int gridSize = waypoint.GetGridSize ();
+		transform.position = new Vector3 (
+			gridPos.x,
+			0f,
+			gridPos.z
+		);
+	}
+
+NOTE: this does not change anything -> just a cleaner way of looking at code.
+
+[Step 10 :]
+
+Change 'gridPos.x' to 'waypoint.GetGridPos().x' and change 'gridPos.z' to 'gridPos.y'
+
+NOTE: why does 'z' change to 'y'? Vector2 int has 2 components (x and y).
+Mapping from 3D-> 2D. 
+
+Should look like this:
+
+void SnapToGrid ()
+	{
+		int gridSize = waypoint.GetGridSize ();
+		transform.position = new Vector3 (
+			waypoint.GetGridPos().x,
+			0f,
+			waypoint.GetGridPos().y
+		);
+	}
+
+---
+Unity's Editor is now not dependant of the CubeEditor. Waypoint script is reporting information back.
+
+---
+[Step 11 :]
+'TextMesh textMesh;' no longer needs to be a member variable. Instead declare 'TextMesh textMesh' in UpdateLabel()
+
+Should look like this:
+
+using UnityEngine;
+
+[ExecuteInEditMode]
+[SelectionBase]
+[RequireComponent(typeof(Waypoint))]
+public class CubeEditor : MonoBehaviour {
+
+	Vector3 gridPos;
+	Waypoint waypoint;
+
+	void Awake()
+	{
+		waypoint = GetComponent<Waypoint> ();
+	}
+
+	void Update()
+	{
+		SnapToGrid ();
+		UpdateLabel ();
+	}
+
+	void SnapToGrid ()
+	{
+		int gridSize = waypoint.GetGridSize();
+		transform.position = new Vector3 (
+			waypoint.GetGridPos().x,
+			0f,
+			waypoint.GetGridPos().y
+		);
+	}
+
+	void UpdateLabel ()
+	{
+		TextMesh textMesh = GetComponentInChildren<TextMesh> ();
+		int gridSize = waypoint.GetGridSize ();
+		string labelText = gridPos.x / gridSize + "," + gridPos.z / gridSize;
+		textMesh.text = labelText;
+		gameObject.name = labelText;
+	}
+}
+
+[Step 12 :]
+
+Remove 'Vector3 gridPos;' from CubeEditor script. Repeat what was done to 'SnapToGrid()' to 'UpdateLabel'
+NOTE: replacing 'gridPos.' with waypoint.GetGridPos(). Remember the 'gridPos.z' will become 'waypoint.GetGridPos().y' because we are dealing with 2D Vectors now.
+
+Should look like this:
+
+	void UpdateLabel ()
+	{
+		TextMesh textMesh = GetComponentInChildren<TextMesh> ();
+		int gridSize = waypoint.GetGridSize ();
+		string labelText = 
+			waypoint.GetGridPos().x / gridSize +
+			"," +
+			waypoint.GetGridPos().y / gridSize;
+		textMesh.text = labelText;
+		gameObject.name = labelText;
+	}
+
+---
+Code is now DE-Coupled!
