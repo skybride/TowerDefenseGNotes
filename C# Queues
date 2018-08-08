@@ -1,0 +1,217 @@
+C# Queues
+
+*Data Structure
+
+Design from Top Down and Bottom Up.
+
+FIFO vs LIFO
+
+FIFO = First In, First Out (dinner queue)
+LIFO = Last In, First Out (stack of plates)
+
+Queues in C# are FIFO:
+
+Should look like this:
+
+Queue<Waypoint> queue
+
+Used like this:
+
+queue.Enqueue() adds to end of queue (adding b after a queue)
+queue.Dequeue() returns the front of the queue (crossing out a queue)
+
+
+---
+
+[Step 1 : ]
+
+Comment out 'ExploreNeighbours()' method and Add a 'Pathfind()' method
+
+Should look like this:
+
+[Pathfinder.cs]
+
+// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		Pathfind ();
+		//ExploreNeighbours ();
+	}
+
+	private void Pathfind ()
+	{
+		
+	}
+
+[Step 2 : ]
+Create a 'Queue<Waypoint>' variable
+
+Should look like this:
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Queue<Waypoint>queue = new Queue<Waypoint>();
+
+	Vector2Int[] directions = {
+		Vector2Int.up,
+		Vector2Int.right,
+		Vector2Int.down,
+		Vector2Int.left
+	};
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		Pathfind ();
+		//ExploreNeighbours ();
+	}
+
+	private void Pathfind ()
+	{
+		
+	}
+
+[Step 3 : ]
+
+Add 'queue.Enqueue(startWaypoint);'
+NOTE: This puts the startWaypoint in the queue.
+
+Should look like this:
+
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		Pathfind ();
+		//ExploreNeighbours ();
+	}
+
+	private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+	}
+
+[Step 4 : ]
+
+While there's something in the queue go around in a while loop.
+
+Should look like this:
+
+	private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0) 
+		{
+	
+		}
+	}
+
+
+[Step 5 : ]
+Create a variable to denote the starting waypoint. Print to test this
+
+Should look like this:
+
+private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0) 
+		{
+			var searchCenter = queue.Dequeue ();
+			print ("Searching from: " + searchCenter);
+		}
+	}	
+
+[Step 6 : ]
+*If we have found the destination. If the start and end point is the same. Algorithm should stop.
+
+NOTE: Halt if end found given the searchCenter
+
+In 'Pathfind()' method add 'HaltIfEndFound(searchCenter);'. In 'HaltIfEndFound()' method (there should be 2 input values, Waypoint and searchCenter) add if statement -> 'if (searchCenter == endWaypoint)' print ("Searching from end node, therefore stopping");
+
+Should look like this:
+
+	private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0) 
+		{
+			var searchCenter = queue.Dequeue ();
+			print ("Searching from: " + searchCenter);
+			HaltIfEndFound (searchCenter);
+		}
+	}
+
+	private void HaltIfEndFound(Waypoint searchCenter)
+	{
+		if (searchCenter == endWaypoint) 
+		{
+			print ("Searching from end node, therefore stopping");
+		}
+	}
+
+---
+Thought process:
+If condition: if the place we are searching for is = to the end point 
+
+[Step 7 : ]
+
+Adding a boolean variable into Pathfinder.cs so that we can determine state. Add 'isRunning = false' to 'HaltIfEndFound(Waypoint searchCenter)' method
+
+Should look like this:
+
+public class Pathfinder : MonoBehaviour {
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Queue<Waypoint>queue = new Queue<Waypoint>();
+	bool isRunning = true;
+
+---
+
+[Step 8 : ]
+
+Make bool a [SerializeField] so that access is allowed in the Inspector (for now). In 'Pathfind()' method after the While loop Print ("Finished pathfinding?") 
+NOTE: 1st step of the algorithm is complete (first check) first step of pathfinding is complete. (endWaypoint has not been reached)
+
+Should look like this:
+
+Queue<Waypoint>queue = new Queue<Waypoint>();
+	[SerializeField] bool isRunning = true; // todo make private
+
+	Vector2Int[] directions = {
+		Vector2Int.up,
+		Vector2Int.right,
+		Vector2Int.down,
+		Vector2Int.left
+	};
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		Pathfind ();
+		//ExploreNeighbours ();
+	}
+
+	private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0) 
+		{
+			var searchCenter = queue.Dequeue ();
+			print ("Searching from: " + searchCenter);
+			HaltIfEndFound (searchCenter);
+		}
+		print ("Finished pathfinding?");
+	}
+
+
+
