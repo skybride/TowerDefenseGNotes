@@ -1,0 +1,31 @@
+Breadth First Search Algorithm
+
+*BFS:
+
+Can be grid or tree view (or graph).
+
+Pseudocode:
+- en-queue the start waypoint
+- while the queue has items
+	- if we find the goal stop
+	- de-queue frontier waypoint
+	- for each direction from frontier
+		- queue new unexplored waypoint
+	- mark frontier as explored
+
+NOTE: Checkout Diagram on Wikipedia on Breadth First Search using a,b,c,d,e,f,g and h.
+
+Shortest path was a, b, e, h
+
+---
+
+*For our game direction will go clockwise starting from up-> right -> down -> left.
+
+a|b|
+g|c|e|
+h|d|f|i|
+l|m|k|z|
+
+a,b,g,c,h,e,d,l,f,i,k,m,l,z
+
+a->b->c->e->f->i->z
