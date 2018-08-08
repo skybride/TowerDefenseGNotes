@@ -1,0 +1,42 @@
+Tower Defense Quiz 1
+
+1. What type of path through our world will our AI be finding in this section?
+
+- Shortest
+
+2. We need to roll our own system for this section, what is the biggest deal-breaker with Unity's built-in pathfinding?
+
+- We want a discrete, digital pathfinding solution rather than an analog system designed for characters on terrains
+
+3. Which of the following best describes z-fighting?
+
+- Two coplanar surfaces competing to be rendered
+
+4. What attribute would you add to a class if you wanted it to be active in the Unity Editor, and where would you place it?
+
+- '[ExecuteInEditMode]
+public class ClassName : Blah {...}'
+
+5. Whyy is Text Mesh more suitable than UI Text for our labelling purposes?
+
+- It's simpler
+
+6. What is the correct syntax to create a new empty list of integers.
+
+- List<int> myList = new List<int>();
+
+7. What is the special return type of a method that turns it into a co-routine in Unity C#?
+
+- IEnumerator
+
+8. Which pathfinding algorithm will we be using in this section?
+
+- Breadth First Search
+
+9. Which is the most true about our Cube Editor script?
+
+- We want our game to be able to run without it.
+
+10. How would you create an empty C# dictionary that has integers as its keys, and words as its values. For example to store the top 20 most popular search terms, or the top 10 players in a sport event?
+
+- Dictionary<int, string> myDict = new Dictionary<int, string>();

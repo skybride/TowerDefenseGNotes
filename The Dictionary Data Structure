@@ -1,0 +1,160 @@
+The Dictionary Data Structure
+
+Pre-Knowledge:
+
+What are dictionaries?
+- Think of them like the index of a book
+- Keys (words) link to values (pages)
+- The keys must be unique and are usually simple
+- The values can be more complex types
+- The lookup is very fast from key to value
+- The lookup is much slower from value to key
+
+Use Dictionaries when...
+- You have simple values that have meaning in their value, such as the position of a waypoint.
+- This meaningful value must be unique, for example one waypoint per grid position
+- You want to associate this unique value with some other value, such as the block at the position.
+
+---
+
+[Step 1 :]
+
+Create a new script called Pathfinder and place it on the World gameobject. Create a Dictionary variable.
+
+Should look like this:
+
+public class Pathfinder : MonoBehaviour {
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+
+[Step 2 :]
+How to use Dictionary? At the 'Start()' of the code Blocks will need to be loaded. Create a Method, and call it in 'Start()'
+
+Should look like this:
+
+void Start (){
+	LoadBlocks();
+}
+
+private void LoadBlocks()
+{
+	
+}
+
+[Step 3 : ]
+How to load blocks? Find all gameobjects of type waypoint. Store waypoints as a variable -> Specify to 'FindObjectsOfType<Waypoint>();'.
+NOTE: This is an Array not a List
+
+Should look like this:
+
+private void LoadBlocks()
+	{
+		var waypoints = FindObjectsOfType<Waypoint> ();	
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+[Step 4 : ]
+Create a foreach loop. In foreach loop code should check for overlapping. If waypoint does not overlap then add to dictioary.
+
+Should look like this:
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+	}
+
+	private void LoadBlocks()
+	{
+		var waypoints = FindObjectsOfType<Waypoint> ();
+		foreach (Waypoint waypoint in waypoints) 
+		{
+			grid.Add (waypoint.GetGridPos(), waypoint);
+		}
+	}
+
+
+[Step 5 : ]
+Create a bool to check if there is overlapping with and if and else statement.
+
+Should look like this:
+
+	private void LoadBlocks()
+	{
+		var waypoints = FindObjectsOfType<Waypoint>();
+		foreach (Waypoint waypoint in waypoints) 
+		{
+			bool isOverlapping = grid.ContainsKey (waypoint.GetGridPos ());
+			if (isOverlapping) {
+				Debug.LogWarning ("Overlapping block " + waypoint);
+			} 
+			else 
+			{
+				grid.Add(waypoint.GetGridPos(), waypoint);
+			}
+		}
+		print(grid.Count);
+	}
+
+[Step 6 : ]
+Alter the printed comments to be more helpful
+
+Should look like this:
+
+	private void LoadBlocks()
+	{
+		var waypoints = FindObjectsOfType<Waypoint>();
+		foreach (Waypoint waypoint in waypoints) 
+		{
+			bool isOverlapping = grid.ContainsKey (waypoint.GetGridPos ());
+			if (isOverlapping) {
+				Debug.LogWarning ("Skipping overlapping block " + waypoint);
+			} 
+			else 
+			{
+				grid.Add(waypoint.GetGridPos(), waypoint);
+			}
+		}
+		print("Loaded " + grid.Count + " blocks");
+	}
+}
+
+[Step 7 : ]
+
+Clean up code to make it easier to read.
+
+Should look like this:
+
+public class Pathfinder : MonoBehaviour {
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+	}
+
+	private void LoadBlocks()
+	{
+		var waypoints = FindObjectsOfType<Waypoint>();
+		foreach (Waypoint waypoint in waypoints) 
+		{
+			var gridPos = waypoint.GetGridPos ();
+			if (grid.ContainsKey(gridPos)) {
+				Debug.LogWarning ("Skipping overlapping block " + waypoint);
+			} 
+			else 
+			{
+				grid.Add(gridPos, waypoint);
+			}
+		}
+		print("Loaded " + grid.Count + " blocks");
+	}
+}
+
+

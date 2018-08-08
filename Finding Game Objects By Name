@@ -1,0 +1,152 @@
+Finding Game Objects By Name
+
+Adding a method to waypoint to specify 'start' and 'end' points.
+
+*Visualizing Algorithms
+
+[Step 1 : ]
+
+Add a new method called 'public void SetTopColor()' to way
+*So that Pathfinder script can grab waypoint and set a color later on
+
+Should look like this: 
+
+	public Vector2Int GetGridPos()
+	{
+		return new Vector2Int(
+			Mathf.RoundToInt (transform.position.x / gridSize) * gridSize,
+			Mathf.RoundToInt (transform.position.z / gridSize) * gridSize
+		);
+	}
+
+	public void SetTopColor()
+	{
+		
+	}
+
+...
+How to find color from Waypoint script? Drilling down and changing the mesh renderer -> material instance for the particular block. 
+NOTE: note changing the material asset which will change all of the blocks
+
+[Step 2 : ]
+
+Add 'print(transform.Find("Top"));' into 'SetTopColor()' method.
+
+(In Waypoint.cs)
+
+
+	public void SetTopColor(Color color)
+	{
+		print (transform.Find ("Top"));
+	}
+
+(In Pathfinder.cs)
+
+var waypoints = FindObjectsOfType<Waypoint>();
+		foreach (Waypoint waypoint in waypoints) 
+		{
+			var gridPos = waypoint.GetGridPos ();
+			if (grid.ContainsKey(gridPos)) {
+				Debug.LogWarning ("Skipping overlapping block " + waypoint);
+			} 
+			else 
+			{
+				grid.Add(gridPos, waypoint);
+				waypoint.SetTopColor (Color.black);
+			}
+
+[Step 3 : ]
+Unity Engine went to the 'Transform' of the block (0,0 for example) and finds a string called "Top" -> which you can then code to find the 'Mesh Renderer' -> and then the 'Material'
+
+
+Should look like this:
+
+	public Vector2Int GetGridPos()
+	{
+		return new Vector2Int(
+			Mathf.RoundToInt (transform.position.x / gridSize) * gridSize,
+			Mathf.RoundToInt (transform.position.z / gridSize) * gridSize
+		);
+	}
+
+	public void SetTopColor(Color color)
+	{
+		print (transform.Find ("Top").GetComponent<MeshRenderer>());
+	}
+
+[Step 4 : ]
+
+Remove print and replace with Mesh Renderer (var type) of (var name) topMeshRenderer
+
+Should look like this:
+
+public void SetTopColor(Color color)
+	{
+		MeshRenderer topMeshRenderer = transform.Find ("Top").GetComponent<MeshRenderer>();
+	}
+
+[Step 5 : ]
+
+Add 'topMeshRenderer.material.color = color;' into method 'SetTopColor'
+And TEST IT!
+
+Should look like this:
+
+public void SetTopColor(Color color)
+	{
+		MeshRenderer topMeshRenderer = transform.Find ("Top").GetComponent<MeshRenderer>();
+		topMeshRenderer.material.color = color;
+	}
+
+
+[Step 6 : ]
+
+Remove 'waypoint.SetTopColor (Color.black);' and 'print("Loadded " + grid.Count + " blocks");' from Pathfinder.cs
+
+
+[Step 7 : ]
+
+In Pathfinder.cs create a new variable '[SerializeField] Waypoint startWaypoint, endWaypoint;'
+
+This will expose a 'Start' and 'End' in the Inspector for World. Drag and drop block 0,0 and 3,1 (or what ever end block coordinate) into the slots available in the Pathfinder(script) in the Inspector.
+
+Should look like this:
+
+public class Pathfinder : MonoBehaviour {
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+
+[Step 8 : ]
+
+Instantiate a new method in start called 'ColorStartAndEnd();'. In method 'ColorStartAndEnd' add 'startWaypoint.SetTopColor (Color.green);' and 'endWaypoint.SetTopColor (Color.red);'
+
+Should look like this:
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Pathfinder : MonoBehaviour {
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+	}
+
+	private void ColorStartAndEnd ()
+	{
+		startWaypoint.SetTopColor (Color.green);
+		endWaypoint.SetTopColor (Color.red);
+	}
+
+
+NOTE:
+We have now made it so that waypoints can be colored from code!
