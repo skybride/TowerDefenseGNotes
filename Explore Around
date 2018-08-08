@@ -1,0 +1,179 @@
+Explore Around
+
+*Specifing the direction that player is allowed to move in (in this case up down and left) a highlighted color.
+
+This is the foundation of pathfinding.
+
+[Step : 1 ]
+
+Remove Enemy Prefab so we can focus on the grid. Click on Main Camera and pan until the Main Camera's view is directyl above grid. Go to GameObject in the top menu -> click on align with view (ctrl + shift + f). 
+
+[Step : 2]
+Adjust Waypoint.cs to avoid confusion. Remove the '* gridSize' in the 'GetGridPos()' method
+
+Should look like this:
+
+	public Vector2Int GetGridPos()
+	{
+		return new Vector2Int(
+			Mathf.RoundToInt (transform.position.x / gridSize),
+			Mathf.RoundToInt (transform.position.z / gridSize)
+		);
+	}
+
+	public void SetTopColor(Color color)
+	{
+		MeshRenderer topMeshRenderer = transform.Find ("Top").GetComponent<MeshRenderer>();
+		topMeshRenderer.material.color = color;
+	}
+
+
+[Step : 3 ]
+
+'GetGridPos' method has to also be adjusted. Highlight this method and press ctrl + shift + f in monodevelop -> click on find. Adjust CubeEditor.cs. Find 'SnapToGrid()' method and '*' 'waypoint.GetGridPos().' by 'gridSize'
+
+Should look like this:
+
+void SnapToGrid ()
+	{
+		int gridSize = waypoint.GetGridSize();
+		transform.position = new Vector3 (
+			waypoint.GetGridPos().x * gridSize,
+			0f,
+			waypoint.GetGridPos().y * gridSize
+		);
+	}
+
+[Step : 4 ]
+Moving down in the 'Search Results' adjust the 'UpdateLabel()' method.
+*Don't need to divide the label by the gridSize
+
+Should look like this:
+
+void UpdateLabel ()
+	{
+		TextMesh textMesh = GetComponentInChildren<TextMesh> ();
+		int gridSize = waypoint.GetGridSize ();
+		string labelText = 
+			waypoint.GetGridPos().x+
+			"," +
+			waypoint.GetGridPos().y;
+		textMesh.text = labelText;
+		gameObject.name = labelText;
+	}
+
+[Step : 5 ]
+How to specify directions? Make an array. Type Should be stored as a Vector2Int
+
+Should look like this: 
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Vector2Int[]directions={}
+
+[Step : 6 ]
+Add Monodevelops pre-existing Vector2Int directions
+
+Should look like this:
+
+Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Vector2Int[]directions={
+		Vector2Int.up,
+		Vector2Int.right,
+		Vector2Int.down,
+		Vector2Int.left
+	};
+
+[Step : 7 ]
+
+Create a new method called 'ExploreNeighbours()' and call it in 'Start()'
+Create a foreach loop in 'ExploreNeighbours()' method. Foreach Vector2Int(which would be coordinate directions) direction in (possible) directions -> do a simple print to see what the console will out put.
+
+Should look like this:
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		ExploreNeighbours ();
+	}
+
+	private void ExploreNeighbours ()
+	{
+		foreach (Vector2Int direction in directions) 
+		{
+			print (direction);
+		}
+	}
+
+[Step : 8 ]
+
+Print exploration log. 
+*Think of EnemyMovement.cs 'starting patrol, visiting block: ,ending patrol'
+NOTE: Ben wants the console to also log where the starting point is
+
+Should look like this:
+
+	private void ExploreNeighbours ()
+	{
+		foreach (Vector2Int direction in directions) 
+		{
+			print ("Exploring block: " + startWaypoint.GetGridPos() + direction);
+		}
+	}
+
+[Step : 9 ]
+Making this into a Vector2Int so that we can add the coordinates.
+
+Should look like this:
+
+private void ExploreNeighbours ()
+	{
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int exploreCoordinates = startWaypoint.GetGridPos () + direction;
+			print ("Exploring block: " + startWaypoint.GetGridPos() + direction);
+		}
+	}
+
+
+[Step : 10]
+
+Adding new TopColor to the grid that has been explored and remove the print line of code
+NOTE: Tell grid to go locate 'explorationCoordinates' in the 'dictionary' and set those coordinates to a color.
+
+Should look like this:
+
+private void ExploreNeighbours ()
+	{
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int exploreCoordinates = startWaypoint.GetGridPos () + direction;
+			grid [exploreCoordinates].SetTopColor (Color.blue);
+		}
+	}
+
+---
+** If starting coordinate is 0,0 -> and there is no neighbour in a certain direction that is being explored -> console will print and error
+
+[Fix]
+Using try and catch
+
+Should look like this:
+
+	private void ExploreNeighbours ()
+	{
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int exploreCoordinates = startWaypoint.GetGridPos () + direction;
+			try
+			{
+				grid [exploreCoordinates].SetTopColor (Color.blue);
+			}
+			catch
+			{
+			}
+		}
+	}
+
+---
+TEST!
