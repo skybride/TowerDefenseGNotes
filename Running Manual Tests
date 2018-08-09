@@ -1,0 +1,206 @@
+Running Manual Tests
+
+[Step 1 : ]
+
+In Pathfinder.cs -> locate 'Pathfind()' method and add 'isRunning' into the While loop
+
+Should look like this:
+
+private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0 && isRunning) 
+		{
+			var searchCenter = queue.Dequeue ();
+			print ("Searching from: " + searchCenter);
+			HaltIfEndFound (searchCenter);
+		}
+		print ("Finished pathfinding?");
+	}
+
+
+[Step 2 : ]
+
+*Goal is to explore neighbours after 'HaltIfEndFound(SearchCenter);' method
+
+Add 'if (!isRunning)' in 'ExploreNeighbours()' method
+
+Should look like this:
+
+private void ExploreNeighbours ()
+	{
+		if (!isRunning) { return; }
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int exploreCoordinates = startWaypoint.GetGridPos () + direction;
+			try
+			{
+				grid [exploreCoordinates].SetTopColor (Color.blue);
+			}
+			catch
+			{
+			}
+		}
+	}
+
+[Step 3 : ]
+
+Add parameters Waypoint and from into 'ExploreNeighbours' method. Rename 'exploreCoordinates' in foreach loop in 'ExploreNeighbours' -> 'neighbourCoordinates'. Replace 'startWaypoint.GridPos' with 'from.GetGridPos'. Add 'queue.Enqueue(grid[neighbourCoordinates])' in try portion of 'ExploreNeighbours' method.
+
+Should look like this:
+
+[Pathfind method]
+
+private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0 && isRunning) 
+		{
+			var searchCenter = queue.Dequeue ();
+			print ("Searching from: " + searchCenter);
+			HaltIfEndFound (searchCenter);
+			ExploreNeighbours (searchCenter);
+		}
+
+
+[ExploreNeighbours method]
+private void ExploreNeighbours (Waypoint from)
+	{
+		if (!isRunning) { return; }
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int neighbourCoordinates = from.GetGridPos () + direction;
+			try
+			{
+				grid [neighbourCoordinates].SetTopColor (Color.blue);
+				queue.Enqueue(grid[neighbourCoordinates]);
+			}
+			catch
+			{
+			}
+		}
+	}
+
+[ Step 4 : ]
+*Refactor and clean up
+NOTE: Dictionary looking into dictionary for coordinates 
+
+Add 'Waypoint neighbour' to be = 'grid[neighbourCoordinates];' and change 'grid[neighbourCoordinates]' -> 'neighbour.SetTopColor(Color.blue);' and 'queue.Enqueue(grid[neighbourCoordinates]);' -> 'queue.Enqueue(neighbour);'
+
+Add print("Queuing " + neighbour); -> to check
+
+Should look like this:
+
+foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int neighbourCoordinates = from.GetGridPos () + direction;
+			try
+			{
+				Waypoint neighbour = grid[neighbourCoordinates];
+				neighbour.SetTopColor (Color.blue);
+				queue.Enqueue(neighbour);
+			}
+
+
+NOTE: if there is an overlapping of 0,0 being queued due to placement of blocks make this adjustment.
+
+In Waypoint.cs
+
+and a public bool variable 'isExplored = false;'
+
+NOTE: It is okay that this bool is public as it is a data class
+
+[Step 5 : ]
+
+call the boolean in the 'Pathfind' method. This should be marked either after 'var searchCenter = queue.Dequeue' or after 'ExplorNeighbours(searchCenter);'
+
+Should look like this:
+
+private void Pathfind ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0 && isRunning) 
+		{
+			var searchCenter = queue.Dequeue ();
+			searchCenter.isExplored = true;
+			print ("Searching from: " + searchCenter);
+			HaltIfEndFound (searchCenter);
+			ExploreNeighbours (searchCenter);
+		}
+
+
+[Step 6 : ]
+
+Extract code in 'ExploreNeighbours' under try -> name this new method 'QueueNewNeighbours' -> with parameters being '(neighbourCoordinates);'.
+'QueueNewNeighbours' should take in the parameters '(Vector2Int neighbourCoordinates)'
+
+Should look like this:
+
+private void ExploreNeighbours (Waypoint from)
+	{
+		if (!isRunning) { return; }
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int neighbourCoordinates = from.GetGridPos () + direction;
+			try
+			{
+				QueueNewNeighbours (neighbourCoordinates);
+			}
+			catch
+			{
+			}
+		}
+	}
+
+	void QueueNewNeighbours (Vector2Int neighbourCoordinates)
+	{
+		Waypoint neighbour = grid [neighbourCoordinates];
+		neighbour.SetTopColor (Color.blue);
+		queue.Enqueue (neighbour);
+		print ("Queueing " + neighbour);
+	}
+
+[Step 7 : ]
+
+In 'QueueNewNeighbours' method add an if statement after dictionary searches in dictionary for coordinates. If statement should take in condition '(neighbour.isExplored)'
+
+Should look like this:
+
+void QueueNewNeighbours (Vector2Int neighbourCoordinates)
+	{
+		Waypoint neighbour = grid [neighbourCoordinates];
+		if (neighbour.isExplored) 
+		{
+			//do nothing
+		} 
+		else 
+		{
+			neighbour.SetTopColor (Color.blue);
+			queue.Enqueue (neighbour);
+			print ("Queueing " + neighbour);
+		}
+	}
+
+---
+
+TEST ALL WAYPOINT COORDINATES!
+...
+Breadth First Search is Working!
+
+Steps:
+(From Start):
+- LoadBlocks()
+- ColorStartAndEnd()
+- Pathfind()
+
+(How to Pathfind?)
+- Input startWaypoint as the beginning of the queue
+- If there is something in the cube and it 'isRunning'
+- Take off the front of the queue (queue.Dequeue())
+- print into console what happened
+- 'HaltIfEndFound'
+- 'Explore' the neighbours(Waypoints)
+- Mark as 'isExplored'
