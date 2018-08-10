@@ -1,0 +1,64 @@
+Quiz 2
+
+1. How would you find a child of a game object the current script is attached by name, looking only one level deep?
+
+- transform.Find("SearchString");
+
+2. What would print in this case, if thing was null?
+
+'GameObject someThing = null;
+ try
+ {
+	print(someThing.name); 
+ }
+ catch
+ {
+	print("Oops"); 
+ }'
+
+- Oops
+
+Why? Trying to access the .name property of someThing that's null will fail, causing the code to "catch" the error
+
+3. Which statement is most true of Breadth First Search (BFS)?
+
+- BFS first searches immediate neighbours, then expands out from each neighbour one step at a time until the goal is found.
+
+4. How would you create an empty queue of strings in C#, and add the word "fireworks" to it?
+
+- Queue<string> wordQueue = new Queue<string>();
+	wordQueue.Enqueue("fireworks");
+
+5. Which statement is most true of the public keyword when used in Unity?
+
+- IT makes an instance variable serialized in the Inspector, and able to be accessed from other scripts.
+
+6. What would the following code print?
+
+'Queue<string> wordQueue = new Queue<string>();
+wordQueue.Enqueue("fireworks");
+wordQueue.Enqueue("musics");
+wordQueue.Dequeue();
+print(wordQueue.Contains("fireworks"));
+print(wordQueue.Contains("music"));'
+
+- false|true
+Why? fireworks is enqueued then dequeued
+
+7. How would you reverse or invert the order of this list?
+
+'List<string> words = new List<string>();'
+
+- words.Reverse();
+
+8. The Transform.LookAt() method rotates the transform of a GameObject so that what is pointed at the target's position?
+
+- The GameObject's forward vector
+
+9. Which of the following is NOT a good reason to learn a tool like MagicaVoxel for asset creation?
+
+- You'll be able to create detailed, photo-realistic looking art for your game.
+
+10. If you want to make your Game Object invisible in your scene you need to turn off which component?
+
+- Mesh Renderer
