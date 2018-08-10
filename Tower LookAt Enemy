@@ -1,0 +1,73 @@
+Tower LookAt Enemy
+
+*Getting Towers to point look and 'shoot' at enemy
+
+[Step 1 : ]
+To Create a Tower!
+
+-Create a Empty GameObject -> Rename Tower.
+-Drag in Tower_Base to be a child of Tower
+-Drag in Tower_Top to be a child of Tower.
+-Reset Transform for Tower GameObject
+-Adjust Tower_Base and Tower_Top transform:Scale to x:0.5, y:0.5, z:0.5
+-Drag up Tower top by 5 to look like it is sitting on base
+
+NOTE: Two parts because only the Tower_Top will be rotating and pivoting to follow Enemy
+
+[Step 2 : ]
+
+Create a new script on Tower -> call it Tower.cs
+
+NOTE: We will be creating a method to get the tower to look at Enemies
+
+- Remove 'void Start()' method
+
+- Create a [SerializeField] variable -> with the Type Transform and the name objectToPan.
+
+- Create a [SerializeField] variable -> Type Tranform with the name targetEnemy
+
+Should look like this:
+
+public class Tower : MonoBehaviour {
+
+	[SerializeField] Transform objectToPan;
+	[SerializeField] Transform targetEnemy;
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+}
+
+[Step 3 : ]
+
+Use 'transform.LookAt(target)' from unity manual as a reference to create a method for the tower to look at enemies.
+
+Should look like this:
+
+public class Tower : MonoBehaviour {
+
+	[SerializeField] Transform objectToPan;
+	[SerializeField] Transform targetEnemy;
+	
+	// Update is called once per frame
+	void Update () {
+		objectToPan.LookAt(targetEnemy);
+	}
+}
+
+[Step 4 : ]
+
+-Move Tower into a position not on the path of the Enemy (Since there is no collision set yet). 
+
+-Inspector while Tower is highlighted in the hierarchy drag and drop Tower_Top into Object to Pan slot under Tower(script)
+
+-Do the same for the Enemy GameObject for the Target Enemy slot
+
+-Test! Tower Should follow Enemy
+
+-Drag Tower GameObject into Assets to make it a Prefab
+
+
+
+
