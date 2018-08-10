@@ -42,7 +42,7 @@ NOTE: remove public on the bool isRunning -> was made public only for testing pu
 
 This also means we can remove the var portion of 'var searchCenter' in the 'Pathfind()' method. (Since we are not instantiating this variable in this method...it has already been declared as a member variable)
 
-'searchCenter' does not have to declared passed into 'HaltIfEndFound' or 'ExploreNeighbours' (print can also now be removed).
+'searchCenter' does not have to declared and passed into 'HaltIfEndFound' or 'ExploreNeighbours' (print can also now be removed).
 
 Should look like this:
 
@@ -79,6 +79,7 @@ public class Pathfinder : MonoBehaviour {
 			searchCenter = queue.Dequeue ();
 			HaltIfEndFound ();
 			ExploreNeighbours ();
+			searchCenter.isExplored = true;
 		}
 		print ("Finished pathfinding?");
 	}
@@ -101,6 +102,7 @@ Should look like this:
 			searchCenter = queue.Dequeue ();
 			HaltIfEndFound ();
 			ExploreNeighbours ();
+			searchCenter.isExplored = true;
 		}
 		print ("Finished pathfinding?");
 	}

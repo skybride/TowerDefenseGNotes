@@ -1,0 +1,338 @@
+Reversing a list
+
+How to Calculate Path:
+
+1. Start at the end waypoint
+2. Add it to a list
+3. Add all intermediate waypoints in a loop
+4. Add the start waypoint
+5. Reverse the list
+
+---
+* Let's fix that gridSize is never used in CubeEditor.cs
+
+In CubeEditor.cs find 'UpdateLabel()' -> remove 'int gridSize = waypoint.GetGridSize();'
+
+---
+
+[Step 1 : ]
+
+We need a list of waypoints. For now make this public. Create a new public variable -> 'List<Waypoint>path;'
+
+Should look like this: 
+
+public class Pathfinder : MonoBehaviour {
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Queue<Waypoint>queue = new Queue<Waypoint>();
+	bool isRunning = true;
+	Waypoint searchCenter;
+	public List<Waypoint> path; //todo make private
+
+[Step 2 : ]
+
+Now that we have 'List<Waypoint> path;' as a variable in Pathfinder.cs Remove '[SerializeField] List<Waypoint> path;' from EnemyMovement.cs
+Comment out the 'IEnumerator FollowPath()' method in EnemyMovement.cs, and remove everything from 'Void Start()'.
+Now path will be on the Pathfinder.cs -> which makes sense
+
+Should look like this: 
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System;
+
+public class EnemyMovement : MonoBehaviour {
+
+	void Start ()
+	{
+		
+	}
+
+	/*
+	IEnumerator FollowPath()
+	{
+		print ("Starting patrol...");
+		foreach (Waypoint waypoint in path) 
+		{
+			transform.position = waypoint.transform.position;
+			print ("Visting block: " + waypoint);
+			yield return new WaitForSeconds (1f); 
+		}
+		print ("Ending patrol");
+	}
+	*/
+}
+
+[Step 3 : ]
+When making a list construct a new list right away. (Could cause strange errors later)
+
+public class Pathfinder : MonoBehaviour {
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Queue<Waypoint>queue = new Queue<Waypoint>();
+	bool isRunning = true;
+	Waypoint searchCenter;
+	public List<Waypoint> path = new List<Waypoint>(); //todo make private
+
+
+[Step 4 : ]	
+
+*Rename 'Pathfind()' -> 'BreadthFirstSearch' -> It loads the blocks checks the neighbours ...which is a BFS not pathfinding.
+
+When should path list happen? Not in Start() -> but when enemyMovement is requesting the path list. For now we will call 'List<Waypoint> path' in 'Start()' -> this will need to change soon.
+
+Remove 'print' in 'BreadthFirstSearch' method
+
+Create a new method in 'Start()' -> 'CreatePath()'. 
+(Think of the order of operation: Game starts-> LoadBlocks runs -> ColorStartAndEnd is makred -> BreadthFirstSearch runs -> CreatePath runs)
+
+Should look like this:
+
+public class Pathfinder : MonoBehaviour {
+
+	[SerializeField] Waypoint startWaypoint, endWaypoint;
+
+	Dictionary<Vector2Int, Waypoint> grid = new Dictionary<Vector2Int, Waypoint>();
+	Queue<Waypoint>queue = new Queue<Waypoint>();
+	bool isRunning = true;
+	Waypoint searchCenter;
+	public List<Waypoint> path = new List<Waypoint>(); //todo make private
+
+	Vector2Int[] directions = {
+		Vector2Int.up,
+		Vector2Int.right,
+		Vector2Int.down,
+		Vector2Int.left
+	};
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		BreadthFirstSearch ();
+		CreatePath ();
+	}
+
+	private void CreatePath()
+	{
+
+	}
+
+	private void BreadthFirstSearch ()
+	{
+		queue.Enqueue (startWaypoint);
+
+		while (queue.Count > 0 && isRunning) 
+		{
+			searchCenter = queue.Dequeue ();
+			HaltIfEndFound ();
+			ExploreNeighbours ();
+			searchCenter.isExplored = true;
+		}
+	}
+
+
+[Step 5 : ]
+
+Add endWaypoint to 'CreatePath' method
+
+Should look like this:
+
+	// Use this for initialization
+	void Start () {
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		BreadthFirstSearch ();
+		CreatePath ();
+	}
+
+	private void CreatePath ()
+	{
+		path.Add (endWaypoint);
+
+	}
+
+[Step 6 : ]
+
+Find the exploredFrom value. Create a new variable in 'CreatePath()' method -> call it 'previous' make it of type 'Waypoint' set it to equal 'endWaypoint.exploredFrom;'
+
+Should look like this:
+
+private void CreatePath ()
+	{
+		path.Add (endWaypoint);
+
+		Waypoint previous = endWaypoint.exploredFrom;
+	}
+
+[Step 7 : ]
+Create a while loop with the condition '(previous != startWaypoint)' add intermediate waypoints.
+(If the previous is not the 'startWaypoint' we want our code to keep adding the Waypoints until the 'startWaypoint' is the one added)
+
+Should look like this:
+
+private void CreatePath ()
+	{
+		path.Add (endWaypoint);
+
+		Waypoint previous = endWaypoint.exploredFrom;
+		while (previous != startWaypoint) 
+		{
+			//add intermediate waypoints
+		}
+	}
+
+[Step 8 : ]
+
+What are we adding as intermediate waypoints?
+endWaypoints.exploredFrom
+
+Should look like this:
+
+private void CreatePath ()
+	{
+		path.Add (endWaypoint);
+
+		Waypoint previous = endWaypoint.exploredFrom;
+		while (previous != startWaypoint) 
+		{
+			path.Add (previous);
+			previous = previous.exploredFrom;
+		}
+
+NOTE: path is adding previous -> then previous is = to the previous that was explored. (This is how we move backwards) Loop continues backward until previous = startWaypoint which breaks the while loop.
+
+[Step 9 : ]
+
+In 'CreatePath()' method after breaking out from while loop add 'path.Add(startWaypoint)' -> similar to how endWaypoint was added. Then reverse the list by adding 'path.Reverse()' underneath
+
+Should look like this:
+
+private void CreatePath ()
+	{
+		path.Add (endWaypoint);
+		Waypoint previous = endWaypoint.exploredFrom;
+		while (previous != startWaypoint) 
+		{
+			path.Add (previous);
+			previous = previous.exploredFrom;
+		}
+
+		path.Add (startWaypoint);
+		path.Reverse ();
+	}
+
+[Step 10 : ]
+
+Go to EnemyMovement.cs in 'void Start' add a variable 'pathfinder' of type 'Pathfinder' and set it to equal 'FindObjectOfType<Pathfinder>();'
+
+Should look like this:
+
+void Start ()
+	{
+		Pathfinder pathfinder = FindObjectOfType<Pathfinder> ();
+	}
+
+[Step 11 : ]
+
+Now to get path from Pathfinder.cs in EnemyMovement.cs.
+Remove the 'public' type from 'List<Waypoint> path = new List<Waypoint>();'.
+
+How to grab list now? Use a getter	
+
+NOTE: providing a simple way for EnemyMovement.cs to have access to path.
+
+public List<Waypoint>GetPath()
+{
+	return path;
+}
+
+[Step 12 : ]
+
+In EnemyMovement.cs add a variable named 'path' and set it equal to 'pathfinder.GetPath();' -> then add 'StartCoroutine(FollowPath());' -> then pass 'path' into '(FollowPath());'
+
+Should look like this:
+
+ void Start ()
+	{
+		Pathfinder pathfinder = FindObjectOfType<Pathfinder> ();
+		var path = pathfinder.GetPath ();
+		StartCoroutine (FollowPath(path));
+	}
+
+[Step 13 : ]
+
+Remove comments on 'IEnumerator' and  add 'List<Waypoint> path'	into the parameters. Passing a List of Waypoints (type) named 'path' into 'FollowPath' method
+
+Should look like this:
+
+public class EnemyMovement : MonoBehaviour {
+
+	void Start ()
+	{
+		Pathfinder pathfinder = FindObjectOfType<Pathfinder> ();
+		var path = pathfinder.GetPath ();
+		StartCoroutine (FollowPath(path));
+	}
+		
+	IEnumerator FollowPath(List<Waypoint> path)
+	{
+		print ("Starting patrol...");
+		foreach (Waypoint waypoint in path) 
+		{
+			transform.position = waypoint.transform.position;
+			yield return new WaitForSeconds (1f); 
+		}
+		print ("Ending patrol");
+	}
+}
+
+[Step 14 : ]
+
+* CreatePath should not be calculated on 'Start()' in Pathfinder.cs -> It should be called when it is asked to calculate a path.
+
+Remove all the methods being called in the 'Start()' and move it to the 'GetPath' method. Now that 'Start()' is empty -> delete it.
+
+NOTE: 'return path;' should be on the bottom
+
+Should look like this:
+
+	public List<Waypoint>GetPath()
+	{
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		BreadthFirstSearch ();
+		CreatePath ();
+		return path;
+	}
+
+[Step 15 : ]
+
+Remove 'Try' and 'Catch'. Replace with if statement.
+
+NOTE: If in dictionary of coordinates against waypoints -> if it contains neighbour coordinates -> queue the neighbour -> if not in the dictionary -> do nothing
+
+Should look like this:
+
+	private void ExploreNeighbours ()
+	{
+		if (!isRunning) { return; }
+		foreach (Vector2Int direction in directions) 
+		{
+			Vector2Int neighbourCoordinates = searchCenter.GetGridPos () + direction;
+			if (grid.ContainsKey(neighbourCoordinates))
+			{
+				QueueNewNeighbours (neighbourCoordinates);
+			}
+		}
+	}
+
+---
+
+Pathfinding is Complete!
+
