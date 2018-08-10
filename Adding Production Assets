@@ -1,0 +1,39 @@
+Adding Production Assets
+
+* Download Rick's Asset Pack, drag and drop into Unity and import.
+
+NOTE: if Voxel Assets -> Prefabs only appear as blue cubes -> highlight all of them -> right click and 'Reimport'
+
+[Step 1 : ]
+
+Create a 3D Object -> Plane -> Reset the transform.
+Adjust transform:Scale to x:30| y:30 | z:30
+Adjust tranform:Position to y:-10
+
+[Step 2 : ]
+
+Click one of the waypoint coordinates -> remove all the children except the 'Top' -> Uncheck the 'Mesh Renderer'. Drag and Drop 'Block_Friendly' into the Hierarchy as a child of the waypoint coordinate that now has only 'Top'. Reset the transform.
+
+NOTE: 'Block_Friendly' will seem massive.
+
+[Step 3 : ]
+Click on the waypoint coordinate -> adjust it's transform:Scale x,y,z from 10,10,10 to 1,1,1. Click on the 'Block_Friendly' gameobject and adjust the transform:Scale x,y,z to 0.5,0.5,0.5
+
+NOTE: Label will seem to have disappered
+
+[Step 4 : ]
+Click on 'Top' -> 'Label'.
+Adjust TextMesh:FontSize -> 500
+Adjust TextMesh:CharacterSize -> 0.06
+Click on 'Block_Friendly' -> adjust transform:Position y:-10
+Click on Apply to change all of the waypoint coordinates
+
+[Step 5 : ]
+Create a new Empty GameObject -> Rename it Envrionment -> Place friendly base in here. Place Enemy_Base, Block_Neutral, Block_Enemy in here.
+NOTE: Hold CTRL to snap these GameObjects into place (after scaling and adjusting their position)
+
+[Step 6 : ]
+Add a skybox (Go Back to Argon Assualt to Grab this Asset).
+Windows -> Lighting -> Settings
+Make main 'Directional Light' -> Sun Source
+Click on 'Directional Light' adjust Intensity to 1.62
