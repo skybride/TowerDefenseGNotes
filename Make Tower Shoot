@@ -1,0 +1,91 @@
+Make Tower Shoot
+
+[Step 1 : ]
+-Create a new Empty GameObject in the Hierarchy and name it Enemies
+-Create a new Empty GameObject in the Hierarchy and name it Towers
+-Drag and drop Tower into Towers and Enemy in to Enemies
+
+[Enemies]
+- When there has been a bullet collision
+- How much HP left
+- When destroyed
+
+[Towers]
+- Shoot or not Shoot
+- Distance (within range)
+- Pick the closest enemy
+- How much damage
+
+[Step 2 :]
+- Create a particle system as a child of TowerA Turn Collision on and change Type to world, and check send collision messsge.
+
+*Rick also changed Simulation Space from Local to Global.
+(Not sure why -> I left mine local)
+
+[Step 3 :]
+
+- Create a new script (Rick called his EnemyDamage.cs) called EnemyExplosion.cs
+- Add OnParticleCollision method with a simple print
+
+Should look like this:
+
+public class EnemyExplosion : MonoBehaviour {
+
+	// Use this for initialization
+	void Start () {
+		
+	}
+	
+	void OnParticleCollision(GameObject other)
+	{
+		print ("I'm hit ");
+
+	}
+		
+} 
+
+NOTE: You will not see a collision. Box Colliders need to be added on to the Enemy A (not Enemy).
+-> You will stil not see anything ...why?
+-> EnemyExplosion.cs has been added to Enemy (Parent of Enemy A)
+
+[Solution]
+
+Create a serializefield.
+
+Should look like this:
+
+public class EnemyExplosion : MonoBehaviour {
+
+	[SerializeField] Collider collisionMesh;
+
+	// Use this for initialization
+	void Start () {
+		
+	}
+	
+	void OnParticleCollision(GameObject other)
+	{
+		print ("I'm hit! ");
+
+	}
+		
+}
+
+[Step 4 :]
+
+-Add a Rigidbody onto 'Enemy' (Not Enemy_A).
+-Drag and drop Enemy_A into Collison Mesh slot under Enemy Explosion (script) in Enemy Prefab.
+
+NOTE:
+
+Enemy -> Rigidbody : gravity and is kinematic should be checked off
+Enemy -> Enemy_A -> Box Collider : Is trigger should not be checked off.
+
+Particle should bounce off of Enemy and OnParticleCollision should print "I'm hit!"
+
+Bonus:
+
+Add 'Destroy(gameObject);' into OnParticleCollision method to have enemy get hit and disappear!
+
+NOTE: DO NOT pass in 'GameObject' into 'Destroy()' method -> must be a small 'g'
+

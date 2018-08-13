@@ -1,0 +1,21 @@
+Solo Challenge
+
+Using Argon Assault as reference, implement:
+	-Towers shoot projectiles
+	-Projectiles collide with enemy
+	-Damage effect is triggered
+	-Enemies lose hit points
+	-Enemies die
+
+Main Feature Buckets:
+1. Shoot + Damage Enemeies
+2. Place Towers
+3. Spawn Enemies
+4. Damage Base
+
+Considerations For Shooting:
+1. Create particle system for bullets
+2. Collision on particles and on enemies
+3. Start and stop shooting based upon enemy distance
+4. Do damage to enemy
+5. Visualise damage
