@@ -1,5 +1,26 @@
 Make Tower Shoot
 
+NOTE:
+[First attempt Problems]
+- Particles do NOT need to be made a child of an Empty GameObject 
+(Enemies -> Enemy -> Enemy_A)
+Enemies -> Nothing attached, Transform: 0,0,0
+Enemy ->  Has 1st orignal script for movement,
+		-> Has New script attached (that will have a SerializeField for CollsionMesh)
+		WHY?: The Mesh Renderer is on the Enemy_A script but the Script making the Mesh Renderer disappear is on the Enemy Script. To keep code clean Materials of prefabs should be kept seperate from logic.
+		If we create a MeshCollider slot as a SerializeField we can drag and drop (to specify which MeshCollider we want to disappear)
+		-> Has a Rigidbody
+
+(Towers -> Tower -> Tower_A_Top -> Bullets)
+Towers -> Nothing attached, Transform: 0,0,0
+Tower -> Tower(script) with object to pan slot and target enemy slot
+Tower_A_Top -> Mesh filter, Mesh Renderer
+Bullets -> Particle system:
+	-> Collision needs to be checked
+	-> Type adjusted from Local to World
+	-> Send Collision Message needs to be checked
+(I also added a Rigidbody and Box Collider on to Bullets this might not be correct method to keep code clean)
+
 [Step 1 : ]
 -Create a new Empty GameObject in the Hierarchy and name it Enemies
 -Create a new Empty GameObject in the Hierarchy and name it Towers

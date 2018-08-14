@@ -1,0 +1,77 @@
+Enemy HitPoints
+
+*Originally named the script Ricky names 'EnemyDamage' -> 'EnemyExplosion'. Rename it to what Rick has named the script to avoid confusion later on.
+
+[Step 1 : ]
+
+Create a new SerializeField -> of type int and variable name hitPoints -> set the value to 10;
+
+Should look like this:
+
+public class EnemyExplosion : MonoBehaviour {
+
+	[SerializeField] Collider collisionMesh;
+	[SerializeField] int hitPoints = 10;
+
+
+[Step 2 : ]
+
+Create a new method 'ProcessHit()'. Pass through variable hitPoints. hitPoints (10) should = hitPoints - 1; 
+
+Thought Process: Processing a hit is equal to hitPoints - 1.
+
+NOTE: use the value 1 for now -> Later on damage variable should be determined by which tower or which bullet is Processing the hit.
+
+Should look like this:
+
+	void ProcessHit()
+	{
+		hitPoints = hitPoints - 1;
+	}
+
+[Step 3 : ]
+
+Call 'ProcessHit()' method in 'OnParticleCollison' method. Print out how many hitPoints there are in 'ProcessHit()' method
+
+Should look like this:
+
+	void OnParticleCollision(GameObject other)
+	{
+		print ("I'm hit! ");
+		Destroy (gameObject);
+		ProcessHit ();
+	}
+
+	void ProcessHit()
+	{
+		hitPoints = hitPoints - 1;
+		print ("Health at " + hitPoints);
+	}
+
+[Step 4 : ]
+
+Create a "KillEnemey()" method in and if statement (if hitPoints that were at 10 get to < 1) and call it in 'OnParticleCollision()' method after 'ProcessHit()'method.
+
+Should look like this:
+
+void OnParticleCollision(GameObject other)
+	{
+		print ("I'm hit! ");
+		ProcessHit ();
+		if (hitPoints < 1) 
+		{
+			KillEnemy ();
+
+		}
+	}
+
+	void ProcessHit()
+	{
+		hitPoints = hitPoints - 1;
+		print ("Health at " + hitPoints);
+	}
+		
+	void KillEnemy ()
+	{
+		Destroy (gameObject);
+	}
