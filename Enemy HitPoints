@@ -58,7 +58,7 @@ void OnParticleCollision(GameObject other)
 	{
 		print ("I'm hit! ");
 		ProcessHit ();
-		if (hitPoints < 1) 
+		if (hitPoints <= 0) 
 		{
 			KillEnemy ();
 
@@ -75,3 +75,5 @@ void OnParticleCollision(GameObject other)
 	{
 		Destroy (gameObject);
 	}
+
+NOTE: use <= 0, instead of < 1 -> cleaner code

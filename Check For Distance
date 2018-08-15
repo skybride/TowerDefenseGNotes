@@ -1,0 +1,134 @@
+Check For Distance
+
+*To keep Prefabs from breaking (Prefabs can not be Nested) remove bullets prefab. If you try to make the Tower a Prefab the bullet prefab will no longer be a prefab (link will be broken). Ends up being messy and confusing.
+To avoid this this anytime you would like to reuse Bullets -> go to tower and reuse it that way.
+
+[Step 1 : ]
+
+Setup logic on Tower script:
+1. Define attack range
+2. Check that an enemy exists
+3. Check for distance from tower to enemey
+4. If distance is less that attack range, fire at enemy
+5. Towers shoot bullets by turning on bullet particle system
+
+[Step : 2 ]
+
+Create a new SerializeField in Tower.cs -> of type float with variable name attackRange -> set it equal to 10f (for now).
+
+Should look like this:
+
+public class Tower : MonoBehaviour {
+
+	[SerializeField] Transform objectToPan;
+	[SerializeField] Transform targetEnemy;
+	[SerializeField] float attackRange = 10f;
+
+[Step : 3 ]
+
+Create another new SerializeField in Tower.cs -> type ParticleSystem with variable name projectileParticle;
+
+public class Tower : MonoBehaviour {
+
+	[SerializeField] Transform objectToPan;
+	[SerializeField] Transform targetEnemy;
+	[SerializeField] float attackRange = 10f;
+	[SerializeField] ParticleSystem projectileParticle;
+
+[Step : 4 ]
+
+Create a new method in Tower.cs -> name it FireAtEnemy() -> pass in a variable 'distanceToEnemy' with type float -> set it equal to a Vector3.Distance -> call 'FireAtEnemy()' in 'Update'
+
+Should look like this:
+
+	void Update () {
+		objectToPan.LookAt(targetEnemy);
+		fireAtEnemy ();
+	}
+
+	static void fireAtEnemy ()
+	{
+		float distanceToEnemy = Vector3.Distance (targetEnemy.transform.position, gameObject.transform.position);
+	}
+
+[Step : 5 ]
+
+Create an if statement in 'FireAtEnemy()' method
+
+Should look like this:
+
+
+	static void fireAtEnemy ()
+	{
+		float distanceToEnemy = Vector3.Distance (targetEnemy.transform.position, gameObject.transform.position);
+		if (distanceToEnemy <= attackRange) 
+		{
+			Shoot (true);
+		}
+		else
+		{
+			Shoot (false);
+		}
+	}
+
+[Step : 6 ]
+
+Shoot method needs to be defined. (Refactor)
+
+Should look like this:
+
+static void fireAtEnemy ()
+	{
+		float distanceToEnemy = Vector3.Distance (targetEnemy.transform.position, gameObject.transform.position);
+		if (distanceToEnemy <= attackRange) 
+		{
+			Shoot (true);
+		}
+		else
+		{
+			Shoot (false);
+		}
+	}
+
+	private void Shoot(bool isActive)
+	{
+		
+	}
+
+[Step : 7 ]
+
+Pass in variable 'emissionModule' and set it to equal 'projectileParticle.emission;' and set emissionModule to active
+
+Should look like this:
+
+private void Shoot(bool isActive)
+	{
+		var emissionModule = projectileParticle.emission;
+		emissionModule.enabled = isActive;
+	}
+
+[Step : 8 ]
+
+Adjust 'Update' method. If there is a 'targetEnemy' -> Tower should pan and fire at Enemy
+
+Should look like this:
+
+public class Tower : MonoBehaviour {
+
+	[SerializeField] Transform objectToPan;
+	[SerializeField] Transform targetEnemy;
+	[SerializeField] float attackRange = 10f;
+	[SerializeField] ParticleSystem projectileParticle;
+	
+	// Update is called once per frame
+	void Update () {
+		if (targetEnemy) {
+			objectToPan.LookAt (targetEnemy);
+			fireAtEnemy ();
+		}
+		else
+		{
+			Shoot (false);
+		}
+
+Add a Second Tower and Test it!
