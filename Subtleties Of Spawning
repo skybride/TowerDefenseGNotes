@@ -1,0 +1,101 @@
+Subtleties Of Spawning
+
+*Cache: local supply -> like a cache of weapons in a game
+
+*Expanding the Pathfinder -> So that it is able to deal with a 2nd Enemy in the World.
+
+NOTE: Jeff Atwood-> founder of stack overflow ->discourse.org
+
+Try:
+- Put game into Play mode and immediately pause it
+- Drag an drop a 2nd Enemy into the Enemies organizer
+- Un-pause
+What Happens?
+- Lots of Warnings and an Error
+Problem?
+- When 2nd Enemy asks Pathfinder to find path that it must go on
+- Cannot run Pathfinder a second time  
+(Therefore problem is not the enemy movement -> it's the pathfinder)
+
+[Tidy Console]
+
+Remove 'print ("Health at " + hitPoints);' in EnemyDamage.cs to keep the console clean
+
+[To Do?]
+
+Modify Pathfinder -> If the path has already been found once -> store it (cache it)
+
+Thought process: Pathfinder needs to only calculate path IF path has not already been calculated
+
+[Store The Path]
+If GetPath() is called a 2nd time, you should return the path you've already calculated and not atempt to calculate it again.
+
+[Solution]
+
+*How can we figure out if path has already been found once?
+
+[Step : 1 ]
+
+In Pathfinder.cs -> adjust 'GetPath()' method -> at the very top if (path.Count == 0) then 'LoadBlocks()' method, 'ColorStartAndEnd()'method, 'BreadthFirstSearch()' method, and 'CreatePath()' method should run else -> return the (current) path
+
+Should look like this:
+
+	public List<Waypoint>GetPath()
+	{
+		if (path.Count == 0) 
+		{
+			LoadBlocks ();
+			ColorStartAndEnd ();
+			BreadthFirstSearch ();
+			CreatePath ();
+			return path;
+		}
+		else 
+		{
+			return path;
+		}
+	}
+
+
+But having 'return path;' twice is repetive.
+
+It should actually look like this:
+
+public List<Waypoint>GetPath()
+	{
+		if (path.Count == 0) 
+		{
+			LoadBlocks ();
+			ColorStartAndEnd ();
+			BreadthFirstSearch ();
+			CreatePath ();
+		}	
+		return path;
+	}
+
+It should be understood that whether Pathfinder is creating the path for the first time or not it needs to return a path to the enemy.
+
+NOTE: This is simpler than creating a boolean in Pathfinder.cs to check to see if path has already ben created once already...but not robust
+
+[Step 2 : ]
+
+Refactor all the calculations in 'GetPath()' method to simplify. Create a new method that runs 'LoadBlocks' up until 'CreatePath' -> name that method 'CalculatePath()'. Now call 'CalculatePath()' in GetPath()
+
+Should look like this
+
+	public List<Waypoint>GetPath()
+	{
+		if (path.Count == 0) 
+		{
+			CalculatePath ();
+		}
+		return path;
+	}
+
+	private void CalculatePath()
+	{
+		LoadBlocks ();
+		ColorStartAndEnd ();
+		BreadthFirstSearch ();
+		CreatePath ();
+	}
