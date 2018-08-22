@@ -1,0 +1,248 @@
+Target Closest Enemy
+
+[Reviewing Instantiation]
+
+[Step : 1 ]
+
+In 'IEnumerator RepeatedlySpawnEnemies()' in EnemySpawner.cs add an Instantiate method
+
+Should look like this:
+
+IEnumerator spawnNewEnemies()
+	{
+		while(true) 
+		{
+			Instantiate ();
+			yield return new WaitForSeconds (secondsBetweenSpawns);
+		}
+	}
+
+[Step 2 : ]
+
+Instatiate method needs to know: 
+- original object aka enemyPrefab
+- instantiate at the position of EnemySpawner point (in this case origin of the world)
+- specify rotation using Quaternion Identity aka no rotation
+
+Should look like this:
+
+IEnumerator spawnNewEnemies()
+	{
+		while(true) 
+		{
+			Instantiate (enemyPrefab, transform.position, Quaternion.identity);
+			yield return new WaitForSeconds (secondsBetweenSpawns);
+		}
+	}
+
+[Step 3 : ]
+
+Add in a range between 0.1f, 120f -> so that a outrageous value for secondsBetweenSpawns cannot be added.
+
+Should look like this:
+
+public class EnemySpawner : MonoBehaviour {
+	
+	[Range(0.1f, 120f)]
+	[SerializeField] float secondsBetweenSpawns = 1f;
+	[SerializeField] EnemyMovement enemyPrefab;
+
+	// Use this for initialization
+	void Start () {
+		//EnemySpawner enemyPrefab = FindObjectOfType<Enemy> ();
+		//var Enemy = enemyPrefab.GetType();
+		StartCoroutine (spawnNewEnemies ());
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+	IEnumerator spawnNewEnemies()
+	{
+		while(true) 
+		{
+			Instantiate (enemyPrefab, transform.position, Quaternion.identity);
+			yield return new WaitForSeconds (secondsBetweenSpawns);
+		}
+	}
+
+}
+
+[Step 4 : ]
+
+Fixing Towers to adjust to a new target Enemy when the current one dies and
+getting Towers to target closest Enemy.
+
+*Parameters vs States:
+-Both are instance variables
+- [SerializeField] type name; <- these are parameters
+Parameters are values that are set at the beginning of the game that dictates how the game will run of each tower.
+- States on the other hand can change within game it can also be specific to each tower.
+(Since in a tower defense game each tower will have a different closest enemy value/ target aka state but the same overall logic aka same serializefields)
+
+Adjust 'targetEnemy' -> to a state. How?
+First Remove [Serializefield]. State will be calculated by code not adjustable in inspector.
+
+Should look like this:
+
+public class Tower : MonoBehaviour {
+	//Parameters
+	[SerializeField] Transform objectToPan;
+	[SerializeField] float attackRange = 10f;
+	[SerializeField] ParticleSystem projectileParticle;
+
+	//State of each tower
+	Transform targetEnemy;
+
+
+[Step 5 : ]
+
+Create a new method called 'SetTargetEnemy' and call it in Update method.
+
+Should look like this:
+
+	void Update () {
+		SetTargetEnemey ();
+		if (targetEnemy) {
+			objectToPan.LookAt (targetEnemy);
+			fireAtEnemy ();
+		}
+		else
+		{
+			Shoot (false);
+		}
+
+		//checkRange ();
+
+	}
+
+	private void SetTargetEnemey()
+	{
+	}
+
+---
+
+*[A Recipe For Superlatives]
+// Get collections of things
+// Assume the first is the 'winner/best' to use
+// For each item in collection
+	//Update winner
+// Return the winner
+
+
+[Step 6 :]
+
+Create a variable with the name 'sceneEnemies' in 'SetTargetEnemy()' method and set it equal to FindObjectsOfType<EnemyDamage>(); 
+
+NOTE: What type? How do we know which to type of enemies to look for?
+We want to look for enemies that can be damageable -> how do we find that?
+We find an enemy with a 'EnemyDamage' script on it.
+
+Should look like this:
+
+private void SetTargetEnemy()
+{
+	var sceneEnemies = FindObjectsOfType<EnemyDamage>();
+}
+
+[Step 7 : ]
+
+Add a check to see if there are any enemies on the screen.
+Using a if statement
+
+Should look like this:
+
+private void SetTargetEnemy()
+{
+	var sceneEnemies = FindObjectsOfType<EnemyDamage>();
+	if(sceneEnemies.Length == 0){ return; }
+
+}
+
+[Step 8 : ]
+
+*So far 'SetTargetEnemy' method is trying to locate all enemies on scene. If there are none do not SetTargetEnemy -> null which means towers will not pan and will not shoot -> Assume the first Enemy (the Enemy with an EnemyDamage.cs)is the best enemy to select.
+
+Create a new variable with type Transform with the name "closetEnemy" and set it = to sceneEnemies[0].transform; (first enemy's transform).
+
+Should look like this:
+
+private void SetTargetEnemy()
+{
+	var sceneEnemies = FindObjectsOfType<EnemyDamage>();
+	if(sceneEnemies.Length == 0){ return; }
+
+	Transform closestEnemy = sceneEnemiesp[0].transform;
+}
+
+[Step 9 : ]
+
+For each item in the collection (in this case enemies) update the winner
+
+Should look like this:
+
+private void SetTargetEnemy()
+{
+	var sceneEnemies = FindObjectsOfType<EnemyDamage>();
+	if(sceneEnemies.Length == 0){ return; }
+
+	Transform closestEnemy = sceneEnemiesp[0].transform;
+
+	foreach (EnemyDamage testEnemy in sceneEnemies)
+	{
+		closestEnemy = GetClosest(closestEnemy, testEnemy.transform);
+	}
+}
+
+NOTE: update 'closestEnemy' by running a new method called 'GetClosest' that compares the closestEnemy(transform) to the testEnemy.transform); 
+
+[Step 10 : ]
+
+Set up a variable 'targetEnemy' to equal 'closestEnemy'
+
+Should look like this: 
+
+private void SetTargetEnemy()
+{
+	var sceneEnemies = FindObjectsOfType<EnemyDamage>();
+	if(sceneEnemies.Length == 0){ return; }
+
+	Transform closestEnemy = sceneEnemiesp[0].transform;
+
+	foreach (EnemyDamage testEnemy in sceneEnemies)
+	{
+		closestEnemy = GetClosest(closestEnemy, testEnemy.transform);
+	}
+
+	targetEnemy = closestEnemy;
+}
+
+[Step 11 : ]
+
+Create 'GetClosest' method -> replace void with Transform. (since we are using GetClosest method to the Transform values)
+
+NOTE: if you create a 'private void GetClosest' method there will be errors
+
+Should look like this:
+
+private Transform GetClosest(Transform transformA, Transform transformB)
+{
+	var distToA = Vector3.Distance(tranform.position, transformA.position);
+	var distToB = Vector3.Distance(transform.position, transformB.position);
+
+	if (distToA < distToB)
+	{
+		return transformA;
+	}
+	return tranformB;
+}
+
+NOTE: 
+distanceA = vector distance of current object position, and transformA.position. Same variable calculation is made for var distToB.
+If distA is less that distB -> A is returned else B is returned.
+
+Towers will shoot based on this logic.
+
+Adjust secondsBetweenSpawns in Inspector to 4 and TEST!
