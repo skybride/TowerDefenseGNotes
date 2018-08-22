@@ -1,0 +1,111 @@
+Revise Coroutines
+
+*Understanding Spawning Architecture
+*How to find previous content for revision
+*Checking Version Control and Compiler Understanding
+*Check out Bloom's Taxonomy -> Spiral Syllabus!
+
+It is okay to not understand right away!
+
+Laying foundation for Spawning Enemies
+
+[How to re-use previous work from Git repo]
+
+1. Find where couroutine was used in previous tutorial.
+2. Click on 'Blame' -> to find where couroutine was added
+
+[Challenge!]
+
+-Create EnemySpawner.cs and expose float secondsBetweenSpawns
+-Attach to the Enemies parent gameobject
+-Connect to the Enemy prefab in the inspector
+-Revise coroutines by spawning enemies (instantiation!)
+
+[Step 1 : ]
+
+Add a new script component named 'EnemySpanwer' on to Enemies (organizer) prefab. Create a serializefield variable of type float with name 'secondsBetweenSpawns'. 
+
+Should look like this: 
+
+public class EnemySpawner : MonoBehaviour {
+
+	[SerializeField] float secondsBetweenSpawns = 1f;
+	[SerializeField] GameObject enemyPrefab;
+}
+
+[What Ben did : ]
+
+public class EnemySpawner : MonoBehaviour {
+
+	[SerializeField] float secondsBetweenSpawns = 2f;
+	[SerializeField] EnemyMovement enemyPrefab;
+}
+
+---
+Why? Both will work. However using GameObject gives the developer the freedom to add any prefab (perhaps not an enemy prefab by accident). Specify that the variable with name 'enemyPrefab' must have an 'EnemyMovement.cs' attached to it.
+
+NOTE: Try adding Tower to EnemyPrefab slot in Inspector view of Enemies -> It should not work. 
+
+[Step 2 : ]
+
+Write out pseudocode to get a grasp of what needs to be done.
+
+Should look like this:
+
+public class EnemySpawner : MonoBehaviour {
+
+	[SerializeField] float secondsBetweenSpawns = 1f;
+	[SerializeField] EnemyMovement enemyPrefab;
+
+	void Start() {
+		//start coroutine
+	}
+
+	//Ienumerator method()
+		//forever
+			//spawn enemy
+			//wait
+}
+
+[Step 3 : ]
+
+Add IEnumerator method -> it will also need a return value
+
+Should look like this
+
+IEnumerator RepeatedlySpawnEnemies()
+{
+	//forever
+		//spawn enemy
+		yield return new WaitForSeconds(secondsBetweenSpawns)
+}
+
+[Step 4 : ]
+
+Now fix the 'Start' method 
+
+Should look like this:
+
+void Start()
+{
+	StartCoroutine(RepeatedlySpawnEnemies());
+}
+
+[Step 5 : ]
+
+Add in a loop to make forever true. Using a while loop
+
+Should look like this:
+
+IEnumerator RepeatedlySpawnEnemies()
+{
+	while(true)
+	{
+		print("Spawning");
+		yield return new WaitForSeconds (secondsBetweenSpawns);
+	}
+}
+
+Use print to see if this code is working.
+
+SAVE and Commit!
