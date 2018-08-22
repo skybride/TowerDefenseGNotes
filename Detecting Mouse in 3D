@@ -1,0 +1,46 @@
+Detecting Mouse in 3D
+
+*Understanding how to place towers by knowning where the mouse is.
+
+Task:
+Placing Towers using OnMouseOver() -> provided my Unity
+
+OnMouseOver():
+- Called every frame when mouse is 'over' a collider
+- Handy general purpose as it works in 2D too (works with GUI elements)
+- Is simple than 'raycasting'
+
+[Challenge]
+
+Report Mouse Over Blocks:
+
+- Lookup OnMouseOver() in Unity's docs
+- See if you can log which block it's over
+
+[Step 1 : ]
+
+Open up Waypoint.cs
+
+Remove:
+
+	public void SetTopColor(Color color)
+	{
+		MeshRenderer topMeshRenderer = transform.Find ("Top").GetComponent<MeshRenderer>();
+		topMeshRenderer.material.color = color;
+	}
+
+...
+
+
+Add void OnMouseOver()
+{
+	print(gameObject.name);
+}
+
+...Problem there is no box collider on this gameObject(coordinate).
+If you look at the gameObject that Waypoint.cs is on there is no box collier.
+
+Solution:
+
+Add a box-collider on to coordinate. Set Box Collider -> Center Y value to -5 (since our world platform was originally moved down by -5 when first constructed our blocks)
+Set Box Collider -> Size x:10 y: 10 z: 10
