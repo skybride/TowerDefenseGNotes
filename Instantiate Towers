@@ -1,0 +1,54 @@
+Bloom's Taxonomy
+[Challenge]
+
+Click and Instantiate Tower.
+
+[Step 1 : ]
+
+In Waypoint.cs create an '[SerializeField] Tower' name it 'TowerPrefab';
+
+- SerializeField so that the prefab can be added via the Inspector
+- Tower -> means that only GameObjects with Tower.cs attached to it can be added this avoids is issues like accidentally adding Enemy Prefab in the wrong spot
+
+NOTE: similar to when trying to instantiate more than one enemyPrefab.
+
+Should look like this:
+
+public class Waypoint : MonoBehaviour {
+
+	public bool isExplored = false;
+	public Waypoint exploredFrom;
+	public bool isPlaceable = true;
+	[SerializeField] Tower TowerPrefab;
+
+[Step 2 : ]
+
+Holding Shift Select all of the coordinates (children of World prefab). Select the Tower GameObject and slide into the slot available in the Inspector -> Waypoint(script).
+
+Hit Play and Start Clicking. 
+
+---
+
+Problem! Towers can Stack on top of each other!
+
+[Step 3 : ]
+
+After clicking -> Instantiating a new tower make isPlaceable false;
+This will stop Tower's from being allowed to be built on top of each other
+
+void OnMouseOver()
+	{
+		if (Input.GetMouseButtonDown(0)) 
+		{
+			if (isPlaceable) 
+			{
+				print ("Placing at " + gameObject.name);
+				Instantiate (TowerPrefab, transform.position, Quaternion.identity);
+				isPlaceable = false;
+			}
+			else
+			{
+				print ("Cannot place here");
+			}
+		}
+
