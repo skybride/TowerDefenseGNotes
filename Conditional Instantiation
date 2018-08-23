@@ -1,0 +1,139 @@
+Conditional Instantiation
+
+*Conditonal detect if we're clicking somewhere that we are allowed to place a tower
+
+Learning how to use Version Control for when Unity crashes and debugging.
+
+Pre-work: 
+Check cleanliness of blocks
+
+[Step 1 : ]
+
+In Waypoint.cs -> in 'OnMouseOver' method add if statement for Type Input with name GetMouseButtonDown() with a value 0 passed in. 
+
+NOTE: 
+0 : primary mouse click
+1 : secondary mouse click
+2 : scroll wheel mouse click
+
+Should look like:
+
+void OnMouseOver()
+	{
+		if (Input.GetMouseButtonDown(0)) {
+			print(gameObject.name);
+		}
+	}
+
+[Step 2 : ]
+
+*Adding in a check for if the spot clicked. Is it okay to place a block where clicked.
+
+Create a new public instance variable with type bool and name isPlaceable and set it to true;
+
+Should look like this:
+
+public class Waypoint : MonoBehaviour {
+
+	public bool isExplored = false;
+	public Waypoint exploredFrom;
+	public bool isPlaceable = true;
+
+[Step 3 : ]
+
+*Adjusting Pathfinder.cs so that path found from BFS is not placeable
+
+Find 'CreatePath' method -> Under 'path.Add(endWaypoint);' add 'endWaypoint.isPlaceable' = false; 
+
+In the while loop in the same method find 'path.Add(previous);' add 'previous.isPlaceable = false;'
+
+NOTE: previous part of the path is not placeable.
+
+After the while loop breaks under 'path.Add(startWaypoint);' add startWaypoint.isPlaceable = false;'
+
+Should look like this:
+
+	private void CreatePath ()
+	{
+		path.Add (endWaypoint);
+		endWaypoint.isPlaceable = false;
+
+		Waypoint previous = endWaypoint.exploredFrom;
+		while (previous != startWaypoint) 
+		{
+			path.Add (previous);
+			previous.isPlaceable = false;
+			previous = previous.exploredFrom;
+		}
+
+		path.Add (startWaypoint);
+		startWaypoint.isPlaceable = false;
+		path.Reverse ();
+	}
+
+[Step 4 : ]
+
+*Factor out isPlaceable = false; to avoid it being repeated.
+
+Create a new method called 'SetAsPath' passing in Waypoint waypoint. In 'SetAsPath' method add 'path.Add(waypoint);' and 'waypoint.isPlaceable = false;'. Now remove the repetition in 'CreatePath' method
+
+Should look like this:
+
+	private void CreatePath ()
+	{
+		SetAsPath (endWaypoint);
+
+		Waypoint previous = endWaypoint.exploredFrom;
+		while (previous != startWaypoint) 
+		{
+			path.Add (previous);
+			SetAsPath (previous);
+		}
+
+		SetAsPath (startWaypoint);
+		path.Reverse ();
+	}
+
+	private void SetAsPath(Waypoint waypoint)
+	{
+		path.Add (waypoint);
+		waypoint.isPlaceable = false;
+	}
+
+---
+[Challenge]
+
+*Distinguish in code if the block is placeable or not using logs
+
+Should look like this:
+
+void OnMouseOver()
+	{
+		if (Input.GetMouseButtonDown(0)) 
+		{
+			if (isPlaceable == true) 
+			{
+				print (gameObject.name);	
+			}
+			else
+			{
+				print ("cannot place here");
+			}
+		}
+
+[What Ben did]
+
+void OnMouseOver()
+{
+	if(Input.GetMouseButtonDown(0))
+	{
+		if (isPlaceable)
+		{
+			print(gameObject.name + " tower placement");
+		}
+		else
+		{
+			print("Can't place here");
+		}
+	}
+}

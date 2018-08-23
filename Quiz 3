@@ -1,0 +1,66 @@
+Quiz 3
+
+1. How dow we make a particle look like a voxel?
+
+- Change renderer mode to mesh and use cube as the mesh
+
+2. Which of the followin is the cause for our bullets not being able to kill our enemies?
+A: Type:World
+B: Min Kill Speed: 1000
+C: Collider Force: 0
+D: Send Collision Messages: Uncheck
+
+- D: Send Collision Messages: Unchecked
+
+3. Which of the following will result in the enemy dying when they are out of health?
+
+- if(hitPoints <= 0)
+{
+	KillEnemy();
+}
+
+4. If we wish to ascertain the distance between 2 GameObjects in 3D space, which of the followin code would be valid to be used within our method?
+
+- Vector3.Distance(gameObject1.transform.position, gameObject2.transform.position);
+
+5. What was the root cause of our errors when we first tried to instantiate a 2nd enemy at runtime?
+
+- The pathfinder wasn't designed to run more than once
+
+6. When will this while loop finish?
+	while(true)
+	{
+		Instantiate(enemyPrefab, transform.position, Quaternion.Identity);
+	}
+
+- It will never finish
+
+7. What's wrong with this code?
+
+void Start()
+{
+	StartCoroutine(RepeatedlySpawnEnemies);
+}
+
+IEnumerator RepeatedlySpawnEnemies()
+{
+	while(true)
+	{
+		print("Spawning");
+		yield return new WaitForSeconds(secondsBetweenSpawns);
+	}
+}
+
+- There is a pair of brackets (AKA parentheses) missing on the 3rd line.
+
+8. Completely off topic for a change... what type of language is C#?
+
+- All of the above!
+
+9. Which of the following would prevent a 'OnMouseOver()' message from being received?
+
+- There being no collider on the same game object as the script
+
+10. Which of the following is NOT a benefit of using version control?
+
+- It improves the speed of your code runs at.
