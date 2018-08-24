@@ -1,0 +1,33 @@
+Circular Or Ring Buffers
+
+www.how
+
+Another mnemonic for question asking...
+
+What? Are we talking about...
+Why? Do we care...
+Who? Already knows...
+How? Do I do it...
+
+[Why Ring Buffers Rock]
+
+- Instantiating + Destroying can be slow operation
+- Destroying leaves a 'hole' in memory
+- Over time memory becomes fragmented
+- Fragmented memory performs badly
+- Basically it's recycling vs disposable
+- You'll need to build your objects to last
+
+
+Thought:
+
+adjust min kill speed so that particle bullet stops bouncing/ lagging
+set couroutine so that bullet can only fire after yielding to wait for x seconds
+
+[To-do List]
+
+- Create a Tower Factory class
+- Move tower prefab and max towers there
+- Note we'll tidy instantiated objects later
+- Wire-up our tower factory, at least in outline
+

@@ -1,0 +1,58 @@
+Particles and Algorithm Improvements
+
+[To dos]
+- Fix and Polish (avoiding bugs and start and end of path).
+- Adding particle effects
+
+NOTE: 
+Ben had 'SetAsPath (previous);' and 'previous = previous.exploredFrom;' set opposite ->
+
+previous = previous.exploredFrom;
+SetAsPath (previous);
+
+instead of 
+
+SetAsPath (previous);
+previous = previous.exploredFrom;
+
+...this caused enemy prefab to be on startWaypoint 0,0 twice and endWaypoint jumped diagonally.
+
+Be aware this is called 'Off By One Error'
+
+Order of method does matter.
+
+SetAsPath method must set previous path before previous can run previous is exploredfrom.
+
+
+
+---
+
+*Fixing Bullet bouncing off!
+
+[Step 1 : ]
+
+(What Ben did to stop Bouncing bullets)
+Open Tower prefab -> Bullets (particle system) -> Collision -> adjust Min Kill Speed to 0
+
+(What I did and why)
+Open Tower prefab -> Bullets (particle system) -> Collision -> adjust Bounce to 0.
+
+Adjusting min kill speed allow towers to shoot enemies faster when they are closer.
+
+Particles still linger before disappearing. Still need to find a better solution for this.
+
+[Step 2 : ]
+
+Adding explosion on bullets destroying enemy.
+
+Create a new '[SerializeField] ParticleSystem' name it 'explode'.
+In 'KillEnemy' method instatiate a new variable 'vfx' and set vfx.Play() -> You can not just set it to '.PlayOnAwake'
+
+Should look like this:
+
+void KillEnemy ()
+	{
+		var vfx = Instantiate (explode, transform.position, Quaternion.identity);
+		vfx.Play ();
+		Destroy (gameObject);
+	}
