@@ -1,0 +1,266 @@
+Implementing A Ring Buffer
+
+[Step 1 : ]
+
+*Where to create TowerFactory class?
+
+- Probably the World GameObject or Environment, since these are where the Towers can be placed.
+
+(Ben picks World)
+
+[Step 2 : ]
+
+Open Waypoint.cs and remove '[SerializeField] Tower towerPrefab;' and add it to TowerFactory.cs
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] Tower TowerPrefab;
+
+
+[Step 3 : ]
+
+Create another [SerializeField] with type int and name it towerLimit and set it to = 5;
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+Problem: Removing TowerPrefab variable from Waypoint.cs will cause errors. Script will be broken. Since Waypoint.cs uses TowerPrefab in 'OnMouseOver' method.
+
+Solution: Instead of having Waypoint.cs control Instantiate Towers we'll have TowerFactory.cs controlling this method.
+
+[Step 4 : ]
+
+In TowerFactory.cs create a public void AddTower method and pass in parameters (aka recipe) Waypoint baseWaypoint
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	public void AddTower(Waypoint baseWaypoint)
+	{
+		
+	}
+}
+
+[Step 5 : ]
+
+In AddTower method and Instantiation for TowerPrefab
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	public void AddTower(Waypoint baseWaypoint)
+	{
+		Instantiate (TowerPrefab, transform.position, Quaternion.identity);
+		isPlaceable = false;
+	}
+}
+
+[Step 6 : ]
+
+In Waypoint.cs -> OnMouseOver method -> in 'if (isPlaceable)' add 'FindObjectOfType<TowerFactory>().AddTower(this);'
+
+NOTE: What is happening?
+
+If button is pressed down -> and waypoint is placeable -> Find object with the type TowerFactory -> Find AddTower method and add 'this' -> 'this' meaning the waypoint script.
+
+Should look like this:
+
+void OnMouseOver()
+	{
+		if (Input.GetMouseButtonDown(0)) 
+		{
+			if (isPlaceable) 
+			{
+				print ("Placing at " + gameObject.name);
+				FindObjectOfType<TowerFactory>().AddTower(this);
+			}
+			else
+			{
+				print ("Cannot place here");
+			}
+		}
+	}
+
+[Step 7 : ]
+
+In TowerFactory.cs isPlaceable will show an error. Add parameter baseWaypoint -> to isPlaceable = false; 
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	public void AddTower(Waypoint baseWaypoint)
+	{
+		Instantiate (TowerPrefab, transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+	}
+}
+
+[Step 8 : ]
+
+Drag and drop Tower Prefab into TowerFactory slot via the Inspector.
+
+Problem:
+
+We can add a Tower but it Instantiates at the origin instead of where we click.
+
+Thought Process:
+
+Adjustment to TowerFactory.cs must be made where Instantiation occurs. 
+Instantiate (towerPrefab, transform.position, Quaternion.identity) -> towerPrefab is the object, transform.position of the world which is 0,0, with no rotation.
+
+Solution:
+
+use the baseWaypoint's transform
+
+Should look like this:
+
+public void AddTower(Waypoint baseWaypoint)
+	{
+		Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+	}
+
+[Step 9 : ]
+
+*Setting a 'towerLimit' means we have to have a way of counting how many towers there are
+
+Create a new instance variable of type int -> name it numTowers and set it = to 0
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	int numTowers = 0;
+
+[Step 10 : ]
+
+Write out if statement -> if the numTowers is less than the towerLimit Instantiate a new Tower -> else print ("Max Towers")
+
+Should look like this:
+
+public void AddTower(Waypoint baseWaypoint)
+{
+	if (numTowers < towerLimit)
+	{
+		Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+	}
+	else
+	{
+		print("Max Towers");
+	}
+}
+
+[Step 11 : ]
+
+Refactor to keep code concise
+
+Should look like this:
+
+	public void AddTower(Waypoint baseWaypoint)
+	{ 
+		if (numTowers < towerLimit) {
+			InstantiateNewTower (baseWaypoint);
+
+		} else {
+			MoveExistingTower ();
+		}
+	}
+
+	static void MoveExistingTower ()
+	{
+		print ("Max Towers");
+	}
+
+	void InstantiateNewTower (Waypoint baseWaypoint)
+	{
+		Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+		numTowers++;
+	}
+
+
+NOTE: add numTowers++ to the new 'InstantiateNewTower' method.
+
+What's happening?
+
+New tower is Instantiated -> baseWaypoint where Tower was just instantiated will NOT be isPlaceable -> add + 1 Tower
+
+Remember numTowers + numTowers the same as numTowers++
+
+Therefore everytime 'AddTower' method is run -> if the numTower is less than towerLimit
+run method 'InstantiateNewTower' with parameters baseWaypoint -> New Tower is created -> a double on the same waypoint cannot be done -> numTowers that started at a value of = 0 gets 1 added to it.
+
+This method repaeats until numTowers is NOT less than towerLimit -> else statement runs and 'MoveExistingTower' is called -> it prints("Max Towers")
+
+
+---
+
+Instead of declaring an int numTowers = 0.
+
+In 'AddTower' method:
+
+a variable could have been instantiated and set to 'FindObjectsOfType<Tower>();'.
+add a variable with type int numTowers after 'FindObjecdtsOfType<Tower>();' and set it equal to "towers.Length;" 
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	public void AddTower(Waypoint baseWaypoint)
+	{ 
+		var towers = FindObjectsOfType<Tower>();
+		int numTowers = towers.Length;
+		if (numTowers < towerLimit) {
+			InstantiateNewTower (baseWaypoint);
+
+		} else {
+			MoveExistingTower ();
+		}
+	}
+
+	static void MoveExistingTower ()
+	{
+		print ("Max Towers");
+	}
+
+	void InstantiateNewTower (Waypoint baseWaypoint)
+	{
+		Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+	}
+}
+
+NOTE: numTowers is not a Global Variable. 
+When 'AddTower' method is run -> variable called towers will 'FindObjectsOfType<Tower>()'
+once towers finds all objects in the scene of Type 'Tower' we count the towers.Length; and set it equal to a variable with type int and name numTowers.
+
+Notice that numTowers++ is removed? 
+
+InstantiateNewTower does not have to keep track of how many towers there are since AddTower has will always be counting the number of towers when AddTower method is run.
+
+AddTower -> Count towers.Length -> check with if else statement -> if less than -> run 'InstantiateNewTower' method -> Place Tower -> On Tower isPlaceable that baseWaypoint is now NOT placeable. -> AddTower again -> check until if else statement is an else -> if greater than -> pring Max Towers.
