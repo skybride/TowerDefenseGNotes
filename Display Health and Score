@@ -1,0 +1,103 @@
+Display Health and Score
+
+*Adding Counter display of how many spawned enemies and player score
+
+[Pre-work]
+Organize Waypoints in an Oranizing Parent empty GameObject -> call it Blocks
+
+[Step 1 : ]
+
+- Create a UI Text in the Hierarchy.
+- Rename Text -> HealthText
+- Anchor Text to desired position
+- Temporarily set Text value via Inspector to 999
+- Change Font Size to 50
+- Change Color to Make it stand out
+
+[Step 2 : ]
+
+- In PlayerHealth.cs add 'using UnityEngine.UI' -> so that we can manipulate the UI through code.
+
+- Create a new '[SerializeField]' of type 'Text' with name 'healthText';
+
+- Create a 'Start()' method
+- In start method set 'healthText.text' to equal 'health.ToString();'
+- In 'OnTriggerEnter' method change 'health = health - deacreaseHealth;' to 'health -= decreaseHealth;' (Same thing)
+
+- Add 'healthText.text = health.ToString();'
+
+- With Friendly_Base selected drag and drop Text to the 'HealthText' slot via the Inspector create the connection.
+
+[Step 3 : ]
+
+*Duplicate for number of enemies spawned
+
+- Create a new UI Text -> Rename 'numSpawn'
+- Set Text value to 999
+- Adjust Anchors
+- Adjust Size
+- Adjust Color
+
+What script should this counter for Enemies be in?
+
+- Create a new '[SerializeField]' of type 'Text' and call it 'numSpawn' in Spawner.cs
+- add a variable instance of type 'int' and call it score;
+
+- In the 'Start' method under the 'StartCoroutine' add 'numSpawn.text' and set it equal to 'score.ToString();'
+
+- In 'spawnNewEnemies()' method -> in the while loop add at the top 'score++;'. 
+- Add 'numSpawn.text = score.ToString()'
+
+
+Run spawnNewEnemies -> while true -> add to the score variable by 1 -> Turn the score value increase to a string -> Instantiate the 'newEnemy' at the position of the parent of 'newEnemy' -> then wait for 'secondsBetweenSpawns'
+
+[Step 4 : ]
+
+Refactor 'score++' and ' spawnedEnemies.text' to keep 'spawnNewEnemies' clean and clear.
+
+Should look like this:
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class EnemySpawner : MonoBehaviour {
+	
+	[Range(0.1f, 120f)]
+	[SerializeField] float secondsBetweenSpawns = 1f;
+	[SerializeField] EnemyMovement enemyPrefab;
+	[SerializeField] Transform enemyParentTransform;
+	[SerializeField] Text numSpawn;
+	int score;
+
+	// Use this for initialization
+	void Start () {
+		//EnemySpawner enemyPrefab = FindObjectOfType<Enemy> ();
+		//var Enemy = enemyPrefab.GetType();
+		StartCoroutine (spawnNewEnemies ());
+		numSpawn.text = score.ToString ();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+	IEnumerator spawnNewEnemies()
+	{
+		while(true) 
+		{
+			AddScore ();
+			var newEnemy = Instantiate (enemyPrefab, transform.position, Quaternion.identity);
+			newEnemy.transform.parent = enemyParentTransform;
+			yield return new WaitForSeconds (secondsBetweenSpawns);
+		}
+	}
+
+	void AddScore ()
+	{
+		score++;
+		numSpawn.text = score.ToString ();
+	}
+}
