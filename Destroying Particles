@@ -1,0 +1,113 @@
+Destroying Particles
+
+[Notes]
+- Typical case, a character dying
+- You want to destroy a character immediately
+- This deletes references to the particle VFX
+- ...the whole script that's running
+- Use Unity's Destroy(object, delay);
+
+[Step 1 : ]
+
+In EnemyDamage.cs -> 'KillEnemy' method add a float variable called 'destroyDelay' and set it equal to 'vfx.main.duration;'. Then Add Destroy method passing in 'vfx.gameObject' and 'destroyDelay' as the parameters.
+
+Should look like this:
+
+void KillEnemy ()
+	{
+		var vfx = Instantiate (explode, transform.position, Quaternion.identity);
+		vfx.Play ();
+		float destroyDelay = vfx.main.duration;
+
+		Destroy (vfx.gameObject, destroyDelay);
+
+		Destroy (gameObject);
+	}
+
+NOTE:
+'Destroy (vfx, destroyDelay);' would not have worked -> you have to destroy the vfx -> on the gameObject.
+
+How ben did it:
+
+void KillEnemy ()
+	{
+		var vfx = Instantiate (explode, transform.position, Quaternion.identity);
+		vfx.Play ();
+		
+		Destroy(vfx.gameObject, vfx.main.duration);
+
+		Destroy(gameObject);	
+	}
+
+[Step 2 : ]
+
+*Organizing Towers that are instantiated. Best place is probably in world
+
+In TowerFactory.cs create a '[SerializeField] Transform towerParentTransform;'
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+	[SerializeField] Transform towerParentTransform;
+
+[Step 3 : ]
+
+In 'InstantiateNewTower' method -> add 'newTower.transform.parent = towerParentTransform;'. -> Now in the hierarchy click on World gameObject drag and drop World into the 'TowerFactory script' slot that was serialized
+
+NOTE: this tells the 'TowerFactory' to use World as the organizing object.
+
+TEST!
+
+Should work!
+
+[Step 4 : ]
+
+*Taking it a step further. Let's organize the Waypoints and the Towers in the World GameObject seperately.
+
+Create a new empty gameobject -> reset the transform. Name it 'Waypoint'.
+Create a new empty gameobject -> reset the transform. Name it 'Towers'.
+Click on the World prefab so that you can drag and drop 'Towers' in the 'Tower Factory Script' slot labelled 'Tower Parent transform' (that we just assigned with World)
+
+TEST!
+
+Tower's that instantiate will be placed in this organizing GameObject
+
+[Step 5 : ]
+
+*Doing the same for the Enemy -> Create an empty GameObject called 'Clones'
+
+In EnemySpawner.cs create a '[Serializefield]' of type 'Transform' with variable name 'enemyParentTransform'
+
+Should look like this:
+
+public class EnemySpawner : MonoBehaviour {
+	
+	[Range(0.1f, 120f)]
+	[SerializeField] float secondsBetweenSpawns = 1f;
+	[SerializeField] EnemyMovement enemyPrefab;
+	[SerializeField] Transform enemyParentTransform;
+
+[Step 6 : ]
+
+In the Coroutine method 'spawnNewEnemies' -> In the while loop create a variable named 'newEnemy' and set it equal to 'Instantiate (enemyPrefab, transform.position. Quaternion.identity);'. Similarly add 'newEnemy.transform.parent' and set it equal to 'enemyParentTransform;'
+
+Should look like this:
+
+IEnumerator spawnNewEnemies()
+	{
+		while(true) 
+		{
+			var newEnemy = Instantiate (enemyPrefab, transform.position, Quaternion.identity);
+			newEnemy.transform.parent = enemyParentTransform;
+			yield return new WaitForSeconds (secondsBetweenSpawns);
+		}
+	}
+
+Now click on the 'Enemies' organizer prefab -> drag and drop the new empty GameObject with the transfrom reset -> into the slot in 'Enemy Spawner script' called 'enemyParentTransform'.
+
+TEST!
+Enemy clones should populate in Clones Prefab!
+
