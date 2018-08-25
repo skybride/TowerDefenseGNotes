@@ -1,0 +1,50 @@
+Complete Game Loop
+
+*Adding speed to Enemies
+
+[Step : 1 ]
+
+In EnemyMovement.cs add a '[SerializeField]' of type 'float' and name it 'movementPeriod = .5f;'
+
+Should look like this:
+
+public class EnemyMovement : MonoBehaviour {
+
+	[SerializeField] float movementPeriod = .5f;
+	[SerializeField] ParticleSystem explosion;
+
+
+[Step : 2 ]
+
+Adjust Enemies organizer prefab -> EnemySpawner via the Inspector -> set Seconds Between Spawn from 4 to 0.75.
+
+---
+
+[My Tweak]
+Rick Add an Explosion when the Enemy hits the End. I added an explosion for when the bullets hit the Enemy.
+
+[Challenge]
+- Destroy Enemy
+- Play Enemy death particles
+- Destroy Enemy death particles
+
+Rick Adds an '[SerializeField]' instance variable of type 'ParticleSystem' with name 'goalParticle'
+
+He create a new Method 'SelfDestruct' and copies -> pastes the 'KillEnemy' method from EnemyDamage.cs
+
+Should look like this:
+
+void SelfDestruct ()
+	{
+		var vfx = Instantiate (goalParticle, transform.position, Quaternion.identity);
+		vfx.Play ();
+		float destroyDelay = vfx.main.duration;
+
+		Destroy (vfx.gameObject, destroyDelay);
+
+		Destroy (gameObject);
+	}
+
+Drag and drop particle for particle explosion into the Enemy prefab via the Inspector -> 'Enemy Movement' script and goalParticle slot.
+
+ 

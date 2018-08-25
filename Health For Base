@@ -1,0 +1,29 @@
+Health For Base
+
+[Step 1 : ]
+
+Create a new script -> call it 'PlayerHealth.cs' on Friendly_Base.
+Open the script -> Create a instance variable called 'health' of typ 'int; and set it to '10;'.
+Create an instance variable for the amount of damage ->
+Call it 'decreaseHealth' of type int set it's value to '1'.
+
+[Step 2 : ]
+Add a box collider on to 'Friendly_Base' and adjust it's position to the waypoint right infront of the 'Friendly_Base'. Make sure is Trigger is checked off
+
+NOTE: An Enemy hitting the box collider will trigger a method.
+
+[Step 3 : ]
+
+Create a new method 'OnTriggerEnter()' that takes in the parameter 'Collider other'.
+
+Set the 'health' to equal health - decreaseHealth;
+
+NOTE:
+Bug 
+jumps from 10 to 8??
+
+Solution:
+
+Enemy Prefab was left in the scene. During Play there were actually 2 Enemy prefabs moving at the same pace ontop of one another.
+
+Remove Enemy -> in Enemies organize prefab. Hit play -> decrease will work properly
