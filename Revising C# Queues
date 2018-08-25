@@ -1,0 +1,287 @@
+Revising C# Queues
+
+*Altering how we count the number of Towers. By using Queues
+Instantiating using Enqueues.
+Dequeuing old towers and Enqueuing them on top
+
+[To-do List]
+
+A queue as the basis of a ring buffer
+- Add to the top of the 'stack of plates'
+- When full, take one of the bottom 
+- Move this to the top
+
+
+*Need to set the waypoint bases as 'placeable' and tell the moved tower what it's new base is
+
+[Step 1 : ]
+
+Create a queue global instance variable in TowerFactory.cs
+
+Should look like this:
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	Queue<Tower> towerQueuej = new Queue<Tower> ();
+
+NOTE:
+When creating a 'Queue' you need to tell it a type -> '<Tower>' -> name it 'towerQueue' set it equal to 'new Queue<Tower>();'
+
+'new Queue<Tower>();' -> Which makes this a method -> it becomes a new empty constructor which is than placed as the variable name 'towerQueue'.
+
+
+[Step 2 : ]
+
+In 'AddTower' method remove variable towers used to find 'Towers'.
+Leave 'int numTowers' but instead of having it = to counting the length of 'towers' (which has been removed) set it equal to 'towerQueue.Count;'
+
+Should look like this:
+
+public void AddTower(Waypoint baseWaypoint)
+	{ 
+		int numTowers = towerQueue.Count;
+		if (numTowers < towerLimit) {
+			InstantiateNewTower (baseWaypoint);
+
+		}
+
+NOTE: 
+What's happening? 
+in numTowers counts the number of 'towerQueues' using '.Count'
+
+[Step 3 : ]
+
+In 'InstantiateNewTower' method set 'Instantiate' to be a variable and name it 'newTower'. Add 'towerQueue.Enqueue()' passing in 'newTower' as the parameter.
+
+Should look like this:
+
+void InstantiateNewTower (Waypoint baseWaypoint)
+	{
+		var newTower = Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+
+		towerQueue.Enqueue (newTower);
+	}
+
+NOTE: Remember Variables are empty containers that hold objects. newTower is an empty container that is holding the Instantiation process.
+This way when towerQueue is being Enqueued we can pass in the variable newTower as the parameter. 
+
+What is being Enqueued? the Instantiation of a newTower
+
+Adding 'towerQueue.Enqueue(newTower);' -> adds a tower into 'towerQueue' -> which is then counted with '.Count' and put into the container of type int with variable name 'numTowers'
+
+[Step 4 : ]
+
+In 'MoveExistingTower' method set the paramter of this method to 'Waypoint baseWaypoint' similar to 'InstantiateNewTower' method. Add a new variable and name it 'oldTower' -> set it equal to 'towerQueue.Dequeue();' -> underneath call towerQueue.Enqueue() and pass in OldTower as the parameters.
+
+Should look like this:
+
+	private void MoveExistingTower (Waypoint baseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+		towerQueue.Enqueue (oldTower);
+	}
+
+NOTE:
+* Change 'private static void MoveExistingTower' -> to 'private void MoveExistingTower'
+To move the tower using 'MoveExistingTower' method we need provide the WHERE? which would be the baseWaypoint.
+
+Where or on What are we moving the tower? on the grid coordinate aka waypoint aka baseWaypoint in TowerFactory.cs
+
+Should look like this now:
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class TowerFactory : MonoBehaviour {
+
+	[SerializeField] int towerLimit = 5;
+	[SerializeField] Tower TowerPrefab;
+
+	Queue<Tower> towerQueue = new Queue<Tower> ();
+
+	public void AddTower(Waypoint baseWaypoint)
+	{ 
+		int numTowers = towerQueue.Count;
+		if (numTowers < towerLimit) {
+			InstantiateNewTower (baseWaypoint);
+
+		} else {
+			MoveExistingTower (baseWaypoint);
+		}
+	}
+		
+
+	private void InstantiateNewTower (Waypoint baseWaypoint)
+	{
+		var newTower = Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+
+		towerQueue.Enqueue (newTower);
+	}
+
+	private void MoveExistingTower (Waypoint baseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+	}
+}
+
+NOTE:
+
+'var oldTower = towerQueue.Dequeue()' continuosly removes the bottom Tower
+
+
+[Step 5 : ]
+
+In Tower.cs add a public instance variable of type Waypoint with name 'baseWaypoint' this will be the value of what the tower is standing on. 
+
+Should look like this:
+
+public class Tower : MonoBehaviour {
+	//Parameters
+	[SerializeField] Transform objectToPan;
+	[SerializeField] float attackRange = 10f;
+	[SerializeField] ParticleSystem projectileParticle;
+
+	public Waypoint baseWaypoint;
+
+[Step 6 : ]
+
+In TowerFactory.cs -> 'MoveExistingTower' method add 'towerQueue.Enqueue (oldTower);' -> to add the old tower 
+
+Should look like this:
+
+	private void MoveExistingTower (Waypoint baseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+		towerQueue.Enqueue (oldTower);
+	}
+
+[Step 7 : ]
+
+In 'InstantiateNewTower' method after 'baseWaypoint.isPlaceable = false;' -> Add 'newTower.baseWaypoint = baseWaypoint'
+
+NOTE: we are setting the 'newTower' baseWaypoint -> to the baseWaypoint parameter we have passed into the 'InstantiateNewTower' method.
+This updates the 'newTower' baseWaypoint
+
+Should look like this:
+
+private void InstantiateNewTower (Waypoint baseWaypoint)
+	{
+		var newTower = Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+
+		newTower.baseWaypoint = baseWaypoint;
+
+		towerQueue.Enqueue (newTower);
+	}
+
+[Step 8 : ]
+
+Now that 'newTower' baseWaypoint has been set -> Make it so that the baseWaypoint the 'newTower' is on cannot have another tower placed on it -> by adding a '.isPlaceable = false'
+
+Should look like this:
+
+private void InstantiateNewTower (Waypoint baseWaypoint)
+	{
+		var newTower = Instantiate (TowerPrefab, baseWaypoint.transform.position, Quaternion.identity);
+		baseWaypoint.isPlaceable = false;
+
+		newTower.baseWaypoint = baseWaypoint;
+		baseWaypoint.isPlaceable = false;
+
+		towerQueue.Enqueue (newTower);
+	}
+
+[Step 9 : ]
+
+What happens when tower is moved?
+After 'var oldTower = towerQueue.Dequeue()' -> add oldTower.baseWaypoint.isPlaceable -> In other words now that the Tower has been moved the baseWaypoint is once again Placeable.
+
+Should look like this:
+
+private void MoveExistingTower (Waypoint baseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+		oldTower.baseWaypoint.isPlaceable = true;
+
+		towerQueue.Enqueue (oldTower);
+	}
+
+[Step 10 : ]
+
+Once placed again the baseWaypoint in the 'MoveExistingTower' method has to be NOT placeable again. 
+
+How?
+
+adding 'isPlaceable = false;'
+
+Should look like this:
+
+private void MoveExistingTower (Waypoint baseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+		oldTower.baseWaypoint.isPlaceable = true;
+		baseWaypoint.isPlaceable = false;
+
+		towerQueue.Enqueue (oldTower);
+	}
+
+[Step 11 : ]
+*To avoid confusion change the 'baseWaypoint' parameter in the 'MoveExistingTower' method to 'newBaseWaypoint'
+
+Now to set the 'oldTower.baseWaypoint' -> It has now been updated to the 'newBaseWaypoint;' aka the parameters passes through the 'MoveExistingTower' method.
+
+Should look like this:
+
+	private void MoveExistingTower (Waypoint newBaseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+		oldTower.baseWaypoint.isPlaceable = true;
+		newBaseWaypoint.isPlaceable = false;
+
+		oldTower.baseWaypoint = newBaseWaypoint;
+
+		towerQueue.Enqueue (oldTower);
+	}
+
+[Step 12 : ]
+
+Now to move the actual tower.
+
+Set the 'oldTower.transform.position' equal to the 'newBaseWaypoint.transform.position;'
+
+Should look like this:
+
+private void MoveExistingTower (Waypoint newBaseWaypoint)
+	{
+		var oldTower = towerQueue.Dequeue ();
+
+		oldTower.baseWaypoint.isPlaceable = true;
+		newBaseWaypoint.isPlaceable = false;
+
+		oldTower.baseWaypoint = newBaseWaypoint;
+
+		oldTower.transform.position = newBaseWaypoint.transform.position;
+
+		towerQueue.Enqueue (oldTower);
+	}
+
+
+TEST!
+
+NOTE:
+
+No new clones are being instantiated after the 'Tower Limit' of 5 is hit. Towers are instead just moved with no errors.
+
+This is a good way to re-use/recycle gameObjects.
