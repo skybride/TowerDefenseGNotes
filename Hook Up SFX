@@ -189,4 +189,29 @@ void KillEnemy ()
 
 ---
 
-Re-watch: @ 4:50 -> Re-take notes to understand how steps to solution was found.
+Try Adding 'Debug.break()' 
+
+AudioSource.PlayClip(enemyDeathSfx, transform.position);
+Debug.break()
+
+and...
+
+GetComponent<AudioSource>().PlayOneShot (enemyDamageSfx);
+Debug.break()
+
+How are they different?
+
+Why is 'AudioSource' on 'KillEnemy' method not heard?
+
+It has to do with 2D and 3D Spatial blend.
+
+Solution?
+
+We need to find what/where the 'Listener' is.
+
+The Listener is on the MainCamera
+
+Adjust to 'AudioSource.PlayClip(enemyDeathSfx, Camera.main.transform.position);'
+This will create the Audio.Source right beside the Camera's position.
+
+TEST! We should now be able to hear the enemy death.

@@ -1,0 +1,28 @@
+Creating Your Game Moment
+
+- Aim to create an interesting 2 minute moment
+- Find the fun in your game moment by tuning what you have rather than looking to add more features.
+-Intention -> Execution
+
+Design Levers Available
+
+- Enemy HPS
+- Enemy speed
+- Enemy spawn rate
+- Tower shot distance
+- Tower rate of fire
+- Number of towers
+- Size of level
+- Path through level
+- Player Health
+- Lighting/visiblity
+- Camera position
+- Camera angle
+- Size of enemies
+- Size of towers
+- Art assets
+- Particle assets
+
+TEST -> Adjust Design Levers -> Iterate Iterate Iterate!
+
+TUNE IT to the EXTREMES!
