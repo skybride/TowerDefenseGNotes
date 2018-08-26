@@ -1,0 +1,18 @@
+Unity Post Processing Stack
+
+*Playing with Tones and Effects of scene
+
+- Unity offers an interface that allows access to visuals for game.
+
+- Go to Asset Store -> Search for Post Processing Stack and download for free and import.
+
+- In Projects search bar search for 'PostProcessingBehaviour'
+(NOT PostProcessingBehaviourEditor)
+
+- Drag and Drop onto the Main Camera
+
+- Click on Main Camera -> in the Inspector the 'PostProcessingBehaviour' should be added, but it should have no 'Profile'
+
+- In Assets -> PostProcessing Right click and hover over create -> find and click on 'create post-processing profile'
+
+- Drag and drop this on to the 'Profile' slot in the Inspector for Main Camera

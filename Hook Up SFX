@@ -1,0 +1,192 @@
+Hook Up SFX
+
+*Rick uses Audacity
+
+Figure out where you'd like to add sounds (at what parts)
+
+[Step : 1 ]
+
+In EnemySpawner.cs create a new '[Serializefield]' of type 'AudioClip' -> name it 'spawnedEnemySFX;'
+
+2 ways to create sound:
+-> in 'Start()' method
+-> in 'spawnNewEnemies()' method
+
+-If you plan on using the same audio clip in various places -> create a global instance variable of type 'AudioSource'.
+
+-In 'Start()' method -> get 'AudioSource' by saying 'myAudioSource = GetComponentOfType<AudioSource>();'
+
+---
+In this case this audio source will only be used here
+
+- In 'spawnNewEnemies()' method -> In the while loop -> under 'AddScore();' -> add 'GetComponent<AudioSource>().PlayOneShot();' passing 'spanwedEnemeySFX' as the parameters.
+
+Should look like this:
+
+public class EnemySpawner : MonoBehaviour {
+	
+	[Range(0.1f, 120f)]
+	[SerializeField] float secondsBetweenSpawns = 1f;
+	[SerializeField] EnemyMovement enemyPrefab;
+	[SerializeField] Transform enemyParentTransform;
+	[SerializeField] Text numSpawn;
+	[SerializeField] AudioClip spawnedEnemySfx;
+
+	int score;
+
+	// Use this for initialization
+	void Start () {
+		//EnemySpawner enemyPrefab = FindObjectOfType<Enemy> ();
+		//var Enemy = enemyPrefab.GetType();
+		StartCoroutine (spawnNewEnemies ());
+		numSpawn.text = score.ToString ();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+	IEnumerator spawnNewEnemies()
+	{
+		while(true) 
+		{
+			AddScore ();
+			GetComponent<AudioSource> ().PlayOneShot (spawnedEnemySfx);
+			var newEnemy = Instantiate (enemyPrefab, transform.position, Quaternion.identity);
+			newEnemy.transform.parent = enemyParentTransform;
+			yield return new WaitForSeconds (secondsBetweenSpawns);
+		}
+
+
+NOTE: 
+DON'T FORGET!
+You need to Add Component -> Audio Source
+
+TEST!
+SHOULD WORK!
+
+[Step 2 : ]
+
+Adding sound to PlayerHealth damage (when Friendly_Base is reached by Enemy)
+
+In PlayerHealth.cs -> Add a '[SerializeField]' of type 'AudioClip' name it 'playerDamageSfx'
+
+In 'OnTriggerEnter' -> Add 'GetComponent<AudioSource>().PlayOneShot(playerDamageSfx);'
+
+Should look like this:
+
+	[SerializeField] int health = 10;
+	[SerializeField] int decreaseHealth = 1;
+	[SerializeField] Text healthText;
+	[SerializeField] AudioClip playerDamageSfx;
+
+	void Start()
+	{
+		healthText.text = health.ToString ();
+	}
+
+	private void OnTriggerEnter(Collider other)
+	{
+		GetComponent<AudioSource> ().PlayOneShot (playerDamageSfx);
+		health -= decreaseHealth;
+		healthText.text = health.ToString ();
+	}
+
+NOTE:
+Don't forget to drag and drop the sound you want to be played into the slot via the inspector -> for the GameObject that 'PlayerHealth' script is attached to.
+
+Don't forget to ADD COMPONENT Audio Source or there will be no sound. You do not have to do anything to Audio Source Component when you add it, but it needs to be there.
+
+TEST!
+
+[Step 3 : ]
+
+Adding sound when Enemy is damaged (gets shot from tower). 
+
+In EnemyDamage.cs -> add a '[SerializeField]' of type 'AudioClip' and name it 'enemyDamageSfx;'
+
+In the 'ProcessHit' method add 'GetComponent<AudioSource>().PlayOneShot(enemyDamageSfx);'
+
+Drag and drop desired sound into the now serializedfield 'enemyDamageSFX' on the Enemy prefab via the inspector. Add Component Audio Source.
+
+TEST!
+
+Should work!
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyDamage : MonoBehaviour {
+
+	[SerializeField] Collider collisionMesh;
+	[SerializeField] int hitPoints = 10;
+	[SerializeField] ParticleSystem explode;
+	[SerializeField] AudioClip enemyDamageSfx;
+
+	// Use this for initialization
+	void Start () {
+		
+	}
+	
+	void OnParticleCollision(GameObject other)
+	{
+		print ("I'm hit! ");
+		ProcessHit ();
+		if (hitPoints <= 0) 
+		{
+			KillEnemy ();
+
+		}
+	}
+
+	void ProcessHit()
+	{
+		GetComponent<AudioSource>().PlayOneShot (enemyDamageSfx);
+		hitPoints = hitPoints - 1; 
+	}
+		
+	void KillEnemy ()
+	{
+		var vfx = Instantiate (explode, transform.position, Quaternion.identity);
+		vfx.Play ();
+
+		float destroyDelay = vfx.main.duration;
+
+		Destroy (vfx.gameObject, destroyDelay);
+
+		Destroy (gameObject);
+	}
+}
+
+[Step 4 : ]
+
+Adding a death sound effect.
+
+In EnemyDamage.cs create a '[SerializeField]' of type 'AudioClip' -> name it 'enemyDeathSfx;'
+
+Solution is similar to the issue with 'explode' vfx playing on a enemy that gets destroyed.
+
+In 'KillEnemy' method -> add 'AudioSource.PlayClipAtPoint()' passing in 'enemyDeathSfx', the transform.position as the parameters.
+
+Should look like this:
+
+void KillEnemy ()
+	{
+		var vfx = Instantiate (explode, transform.position, Quaternion.identity);
+		vfx.Play ();
+
+		float destroyDelay = vfx.main.duration;
+
+		Destroy (vfx.gameObject, destroyDelay);
+
+		AudioSource.PlayClipAtPoint (enemyDeathSfx, transform.position);
+
+		Destroy (gameObject);
+	}
+
+
+---
+
+Re-watch: @ 4:50 -> Re-take notes to understand how steps to solution was found.
