@@ -1,0 +1,60 @@
+Quiz 4
+
+1. Which sequence best broadly describes the journey of mastering a given topic?
+
+- Watch > Copy > Create
+
+2. Which of these types of assets links is safest to use?
+
+- Prefab to Prefab
+
+3. What would happen to Tower 1 when we try and add Tower 6, assuming we have a 5 tower limit? Assume we've implemented the ring buffer as discussed.
+
+- It would move from where it was, to the position we're requesting for Tower 6.
+
+4. Which statement best describes what this line of code is doing, if it's within a script called Waypoint.cs?
+'FindObjectOfType<TowerFactory>().AddTower(this);'
+
+- 
+1. Find the first game object in the scene that has a 'TowerFactory' component attached.
+2. Call its 'AddTower()' public method
+3. Passes reference to the instance of 'this' particular waypoint.
+
+5. How would you determine the length of this queue?
+'Queue<MyCoolType> myCoolQueue = new Queue<MyCoolType>();'
+
+- myCoolQueue.Count;
+
+6. Which statement is most true of 'Destroy(thisThing, 3f);'?
+
+- thisThing will be destroyed after 3 seconds, even if the game object this code is written is destroyed beforehand.
+
+7. What do we mean by 'a complete game loop'?
+
+- The game has a natural start and end that allows for continued gameplay with consequences of actions.
+
+8. What is another way that we can write this statement to get the same result:
+'health = health - healthDecrease;'
+
+- health -= healthDecrease;
+
+9. A useful site for finding free fonts for your game is...
+
+- dafont.com
+
+10. The file which contains the settings for our Post Processing Stack is called what?
+
+- Post-Processing Profile
+
+11. What does SFX stand for?
+
+- Sound Effects
+
+12. Why would we use 'PlayClipAtPoint()'?
+
+- To ensure the audio clip is not destroyed when its parent GameObject is destroyed.
+
+13. When tuning your game to 'find the fun', it helps to remember which of the following design philosophies?
+
+- Execute your Intention.
+
